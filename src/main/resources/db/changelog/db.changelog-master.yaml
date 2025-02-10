@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/changeset/issues/issues_v001_initial.sql
+  - include:
+      file: db/changelog/changeset/issues/mediafiles/issues_media_v001_initial.sql
+  - include:
+      file: db/changelog/changeset/users/users_v001_initial.sql
