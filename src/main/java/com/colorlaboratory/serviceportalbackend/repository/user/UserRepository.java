@@ -1,6 +1,6 @@
 package com.colorlaboratory.serviceportalbackend.repository.user;
 
-import com.colorlaboratory.serviceportalbackend.model.entity.User;
+import com.colorlaboratory.serviceportalbackend.model.entity.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

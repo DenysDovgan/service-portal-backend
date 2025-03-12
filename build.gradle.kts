@@ -24,13 +24,28 @@ repositories {
 }
 
 dependencies {
+    // Starters
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
+
+    // Authentication
     implementation("io.jsonwebtoken:jjwt-api:0.12.6")
+
+    // Database and migrations
     implementation("org.liquibase:liquibase-core")
+    implementation("org.postgresql:postgresql:42.7.5")
+
+    // env variables
+    implementation("me.paulschwarz:spring-dotenv:4.0.0")
+
+    // Mapping
+    implementation("org.mapstruct:mapstruct:1.6.3")
+    annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
+
+
     compileOnly("org.projectlombok:lombok")
     runtimeOnly("org.postgresql:postgresql")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")

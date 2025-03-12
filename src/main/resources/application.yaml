@@ -1,3 +1,18 @@
 spring:
   application:
     name: service-portal-backend
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+logging:
+  level:
+    com.zaxxer.hikari: DEBUG
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration-time: ${JWT_EXPIRATION_TIME}
