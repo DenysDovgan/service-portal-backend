@@ -72,7 +72,7 @@ public class UserValidator {
                 });
 
         // Admins can change any user's password, no further validation needed
-        if (currentUser.getRole() == Role.ADMIN) {
+        if (currentUser.getRole() == Role.ADMIN && targetUser.getRole() != Role.ADMIN) {
             log.info("Admin {} is changing password for user {}", currentUserEmail, userId);
             return targetUser;
         }

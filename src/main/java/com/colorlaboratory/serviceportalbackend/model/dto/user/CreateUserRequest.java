@@ -36,6 +36,7 @@ public class CreateUserRequest {
     private String country;
 
     @Size(max = 255)
+    @NotBlank
     private String companyName;
 
     @NotNull
