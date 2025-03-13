@@ -2,11 +2,13 @@ package com.colorlaboratory.serviceportalbackend.utils;
 
 import com.colorlaboratory.serviceportalbackend.model.entity.user.Role;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -57,7 +59,14 @@ public class JwtUtil {
         return extractClaims(token).getSubject();
     }
 
-    public boolean isTokenValid(String token) {
-        return extractClaims(token).getExpiration().after(new Date());
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = extractEmail(token);
+        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
+
+    private boolean isTokenExpired(String token) {
+        return extractClaims(token).getExpiration().before(new Date());
+    }
+
+
 }

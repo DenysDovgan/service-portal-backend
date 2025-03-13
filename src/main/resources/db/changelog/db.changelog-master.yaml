@@ -2,10 +2,10 @@ databaseChangeLog:
   - include:
       file: db/changelog/changeset/users/users_v001_initial.sql
   - include:
-      file: db/changelog/changeset/issue/issue_v001_initial.sql
+      file: db/changelog/changeset/issues/issues_v001_initial.sql
   - include:
-      file: db/changelog/changeset/issue/issue_media_v001_initial.sql
+      file: db/changelog/changeset/issues/issues_media_v001_initial.sql
   - include:
-      file: db/changelog/changeset/issue/issue_assigment_v001_initial.sql
+      file: db/changelog/changeset/issues/issues_assigment_v001_initial.sql
   - include:
       file: db/changelog/changeset/indexes/indexes_v001_initial.sql
