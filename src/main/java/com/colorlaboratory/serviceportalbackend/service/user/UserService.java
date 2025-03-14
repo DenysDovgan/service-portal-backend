@@ -2,19 +2,25 @@ package com.colorlaboratory.serviceportalbackend.service.user;
 
 import com.colorlaboratory.serviceportalbackend.mapper.user.UserMapper;
 import com.colorlaboratory.serviceportalbackend.model.dto.user.ChangePasswordRequest;
+import com.colorlaboratory.serviceportalbackend.model.dto.user.UpdateUserRequest;
 import com.colorlaboratory.serviceportalbackend.model.dto.user.UserDto;
 import com.colorlaboratory.serviceportalbackend.model.dto.user.CreateUserRequest;
+import com.colorlaboratory.serviceportalbackend.model.entity.user.Role;
 import com.colorlaboratory.serviceportalbackend.model.entity.user.User;
 import com.colorlaboratory.serviceportalbackend.repository.user.UserRepository;
 import com.colorlaboratory.serviceportalbackend.service.notification.NotificationService;
 import com.colorlaboratory.serviceportalbackend.validator.user.UserValidator;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +31,38 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserValidator userValidator;
     private final NotificationService notificationService;
+
+    public List<UserDto> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        return userMapper.toDtoList(users);
+    }
+
+    public List<UserDto> getAllAdmins() {
+        List<User> admins = userRepository.findByRole((Role.ADMIN));
+        return userMapper.toDtoList(admins);
+    }
+
+    public List<UserDto> getFilteredUsers(Role role, String sortBy, String order, Integer minIssues, Integer maxIssues, String company, String name) {
+        userValidator.validateGetFilteredUsers(role);
+        List<User> users = userRepository.findUsersWithFilters(role, sortBy, order, minIssues, maxIssues, company, name);
+        return userMapper.toDtoList(users);
+    }
+
+    public UserDto getCurrentUser() {
+        return userValidator.validateGetCurrentUser();
+    }
+
+    public UserDto getUserById(@NotNull Long userId) {
+        UserDto targetUser = userMapper.toDto(userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.error("User with id {} not found", userId);
+                    return new EntityNotFoundException("User with id " + userId + " not found");
+                }));
+
+        userValidator.validateGetUserById(targetUser);
+
+        return targetUser;
+    }
 
     @Transactional
     public UserDto createUser(CreateUserRequest request) {
@@ -55,6 +93,7 @@ public class UserService {
         return userMapper.toDto(newUser);
     }
 
+    @Transactional
     public void changePassword(ChangePasswordRequest request, Long userId) {
         log.info("Initiating password change for user with id: {}", userId);
 
@@ -68,6 +107,17 @@ public class UserService {
         log.info("Password successfully changed for user with id: {}", userId);
     }
 
+    @Transactional
+    public void deleteUser(Long userId) {
+        log.info("Deleting user with id: {}", userId);
+
+        userValidator.validateDeleteUser(userId);
+
+        userRepository.deleteById(userId);
+
+        log.info("User with id {} deleted successfully", userId);
+    }
+
     private String generateRandomPassword() {
         SecureRandom random = new SecureRandom();
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*!";
@@ -77,5 +127,29 @@ public class UserService {
             password.append(characters.charAt(random.nextInt(characters.length())));
         }
         return password.toString();
+    }
+
+    @Transactional
+    public UserDto updateUser(Long userId, UpdateUserRequest request) {
+        log.info("Updating user with id: {}", userId);
+
+        User targetUser = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.error("User with id {} not found", userId);
+                    return new EntityNotFoundException("User with id " + userId + " not found");
+                });
+
+        userValidator.validateUpdateUser(userMapper.toDto(targetUser));
+
+        targetUser.setEmail(request.getEmail());
+        targetUser.setPhoneNumber(request.getPhoneNumber());
+        targetUser.setCity(request.getCity());
+        targetUser.setCountry(request.getCountry());
+        targetUser.setCompanyName(request.getCompanyName());
+
+        User updatedUser = userRepository.save(targetUser);
+
+        log.info("User with id {} updated successfully", userId);
+        return userMapper.toDto(updatedUser);
     }
 }
