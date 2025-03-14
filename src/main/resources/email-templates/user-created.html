@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 500px;
+            margin: auto;
+            color: black;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: #ff5e1f;
+            padding: 20px;
+            text-align: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .logo {
+            color: white;
+            width: 120px;
+            height: auto;
+        }
+        .button {
+            background: #ff5e1f;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .button a {
+            color: inherit;
+        }
+        .password-box {
+            font-size: 18px;
+            font-weight: bold;
+            background: #eef1f8;
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <!-- Replace the SVG content below with your actual logo -->
+        <img class="logo" src="cid:logo" alt="Company Logo">
+    </div>
+
+    <h2>Welcome, {{firstName}}!</h2>
+    <p>We are excited to have you on board. Below are your login details:</p>
+
+    <p><strong>Email:</strong> {{email}}</p>
+    <p><strong>Temporary Password:</strong> <span class="password-box">{{password}}</span></p>
+
+    <p>For security reasons, please <strong>change your password</strong> after logging in.</p>
+
+    <a class="button" href="{{loginLink}}">Login to Your Account</a>
+
+    <p>Best Regards,<br> Color Laboratory MD Team</p>
+</div>
+</body>
+</html>
