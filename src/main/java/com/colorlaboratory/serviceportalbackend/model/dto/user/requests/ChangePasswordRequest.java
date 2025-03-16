@@ -1,4 +1,4 @@
-package com.colorlaboratory.serviceportalbackend.model.dto.user;
+package com.colorlaboratory.serviceportalbackend.model.dto.user.requests;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

@@ -1,10 +1,10 @@
 package com.colorlaboratory.serviceportalbackend.service.user;
 
 import com.colorlaboratory.serviceportalbackend.mapper.user.UserMapper;
-import com.colorlaboratory.serviceportalbackend.model.dto.user.ChangePasswordRequest;
-import com.colorlaboratory.serviceportalbackend.model.dto.user.UpdateUserRequest;
+import com.colorlaboratory.serviceportalbackend.model.dto.user.requests.ChangePasswordRequest;
+import com.colorlaboratory.serviceportalbackend.model.dto.user.requests.UpdateUserRequest;
 import com.colorlaboratory.serviceportalbackend.model.dto.user.UserDto;
-import com.colorlaboratory.serviceportalbackend.model.dto.user.CreateUserRequest;
+import com.colorlaboratory.serviceportalbackend.model.dto.user.requests.CreateUserRequest;
 import com.colorlaboratory.serviceportalbackend.model.entity.user.Role;
 import com.colorlaboratory.serviceportalbackend.model.entity.user.User;
 import com.colorlaboratory.serviceportalbackend.repository.user.UserRepository;
@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,10 +41,11 @@ public class UserService {
         return userMapper.toDtoList(admins);
     }
 
-    public List<UserDto> getFilteredUsers(Role role, String sortBy, String order, Integer minIssues, Integer maxIssues, String company, String name) {
+    public List<UserDto> filterUsers(Role role, String sortBy, String order, String name, String email, String phoneNumber,
+                                     String company, String city, String country, Integer minAssignedIssues) {
         UserDto currentUser = getCurrentUser();
         userValidator.validateGetFilteredUsers(currentUser, role);
-        List<User> users = userRepository.findUsersWithFilters(role, sortBy, order, minIssues, maxIssues, company, name);
+        List<User> users = userRepository.filterUsers(role, sortBy, order, name, email, phoneNumber, company, city, country, minAssignedIssues);
         return userMapper.toDtoList(users);
     }
 

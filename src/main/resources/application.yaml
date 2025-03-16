@@ -27,3 +27,6 @@ spring:
 jwt:
   secret: ${JWT_SECRET}
   expiration-time: ${JWT_EXPIRATION_TIME}
+
+gcs:
+  bucket-name: ${GCS_BUCKET_NAME}

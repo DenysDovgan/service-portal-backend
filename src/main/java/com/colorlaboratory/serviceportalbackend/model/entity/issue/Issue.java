@@ -1,8 +1,11 @@
 package com.colorlaboratory.serviceportalbackend.model.entity.issue;
 
+import com.colorlaboratory.serviceportalbackend.model.entity.media.Media;
 import com.colorlaboratory.serviceportalbackend.model.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,14 +22,36 @@ public class Issue {
 
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false)
-    private User client;
+    private User createdBy;
 
-    @Column(nullable = false)
+    @Column(name = "title", nullable = false)
+    private String title;
+
+    @Column(name = "description", nullable = false)
     private String description;
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private IssueStatus status;
+
+    @Column(name = "created_at", nullable = false)
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL)
-    private List<IssueMedia> media;
+    @Column(name = "updated_at", nullable = false)
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Media> media;
+
+    @OneToMany(mappedBy = "issue", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<IssueAssignment> assignments;
+
+
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

@@ -1,6 +1,7 @@
 package com.colorlaboratory.serviceportalbackend.model.entity.user;
 
 import com.colorlaboratory.serviceportalbackend.model.entity.issue.Issue;
+import com.colorlaboratory.serviceportalbackend.model.entity.issue.IssueAssignment;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -67,8 +68,14 @@ public class User implements UserDetails {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "createdBy", cascade = CascadeType.ALL)
     private List<Issue> issues;
+
+    @OneToMany(mappedBy = "technician")
+    private List<IssueAssignment> assignedIssues = new ArrayList<>();
+
+    @OneToMany(mappedBy = "assignedBy")
+    private List<IssueAssignment> assignmentsMade = new ArrayList<>();
 
 
 

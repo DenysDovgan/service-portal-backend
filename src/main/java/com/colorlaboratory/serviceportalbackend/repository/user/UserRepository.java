@@ -15,20 +15,31 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findByRole(Role role);
 
-    @Query("SELECT u FROM User u LEFT JOIN u.issues i " +
-            "WHERE u.role = :role " +
-            "AND (:minIssues IS NULL OR SIZE(u.issues) >= :minIssues) " +
-            "AND (:maxIssues IS NULL OR SIZE(u.issues) <= :maxIssues) " +
+    @Query("SELECT u FROM User u LEFT JOIN u.assignedIssues a " +
+            "WHERE (:role IS NULL OR u.role = :role) " +
+            "AND (:name IS NULL OR LOWER(u.firstName) LIKE LOWER(CONCAT('%', :name, '%')) OR LOWER(u.lastName) LIKE LOWER(CONCAT('%', :name, '%'))) " +
+            "AND (:email IS NULL OR u.email LIKE %:email%) " +
+            "AND (:phoneNumber IS NULL OR u.phoneNumber LIKE %:phoneNumber%) " +
             "AND (:company IS NULL OR u.companyName LIKE %:company%) " +
-            "AND (:name IS NULL OR u.firstName LIKE %:name% OR u.lastName LIKE %:name%) " +
+            "AND (:city IS NULL OR u.city LIKE %:city%) " +
+            "AND (:country IS NULL OR u.country LIKE %:country%) " +
+            "AND (:minAssignedIssues IS NULL OR SIZE(u.assignedIssues) >= :minAssignedIssues) " +
             "ORDER BY " +
             "CASE WHEN :sortBy = 'name' AND :order = 'asc' THEN u.firstName END ASC, " +
-            "CASE WHEN :sortBy = 'name' AND :order = 'desc' THEN u.firstName END DESC")
-    List<User> findUsersWithFilters(@Param("role") Role role,
-                                    @Param("sortBy") String sortBy,
-                                    @Param("order") String order,
-                                    @Param("minIssues") Integer minIssues,
-                                    @Param("maxIssues") Integer maxIssues,
-                                    @Param("company") String company,
-                                    @Param("name") String name);
+            "CASE WHEN :sortBy = 'name' AND :order = 'desc' THEN u.firstName END DESC, " +
+            "CASE WHEN :sortBy = 'email' AND :order = 'asc' THEN u.email END ASC, " +
+            "CASE WHEN :sortBy = 'email' AND :order = 'desc' THEN u.email END DESC, " +
+            "CASE WHEN :sortBy = 'assignedIssues' AND :order = 'asc' THEN SIZE(u.assignedIssues) END ASC, " +
+            "CASE WHEN :sortBy = 'assignedIssues' AND :order = 'desc' THEN SIZE(u.assignedIssues) END DESC")
+    List<User> filterUsers(@Param("role") Role role,
+                           @Param("sortBy") String sortBy,
+                           @Param("order") String order,
+                           @Param("name") String name,
+                           @Param("email") String email,
+                           @Param("phoneNumber") String phoneNumber,
+                           @Param("company") String company,
+                           @Param("city") String city,
+                           @Param("country") String country,
+                           @Param("minAssignedIssues") Integer minAssignedIssues);
+
 }

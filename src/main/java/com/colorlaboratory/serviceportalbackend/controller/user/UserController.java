@@ -1,9 +1,9 @@
 package com.colorlaboratory.serviceportalbackend.controller.user;
 
 import com.colorlaboratory.serviceportalbackend.model.dto.api.ApiResponse;
-import com.colorlaboratory.serviceportalbackend.model.dto.user.ChangePasswordRequest;
-import com.colorlaboratory.serviceportalbackend.model.dto.user.CreateUserRequest;
-import com.colorlaboratory.serviceportalbackend.model.dto.user.UpdateUserRequest;
+import com.colorlaboratory.serviceportalbackend.model.dto.user.requests.ChangePasswordRequest;
+import com.colorlaboratory.serviceportalbackend.model.dto.user.requests.CreateUserRequest;
+import com.colorlaboratory.serviceportalbackend.model.dto.user.requests.UpdateUserRequest;
 import com.colorlaboratory.serviceportalbackend.model.dto.user.UserDto;
 import com.colorlaboratory.serviceportalbackend.model.entity.user.Role;
 import com.colorlaboratory.serviceportalbackend.service.user.UserService;
@@ -15,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RequestMapping("/api/users")
 @RestController
@@ -30,17 +31,20 @@ public class UserController {
     }
 
     @GetMapping("/filter")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'HEAD_MANAGER')")
-    public ResponseEntity<List<UserDto>> getFilteredUsers(
-            @RequestParam Role role,
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'SERVICE_MANAGER')")
+    public ResponseEntity<List<UserDto>> filterUsers(
+            @RequestParam(required = false) Role role,
             @RequestParam(required = false) String sortBy,
             @RequestParam(required = false, defaultValue = "asc") String order,
-            @RequestParam(required = false) Integer minIssues,
-            @RequestParam(required = false) Integer maxIssues,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String phoneNumber,
             @RequestParam(required = false) String company,
-            @RequestParam(required = false) String name
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String country,
+            @RequestParam(required = false) Integer minAssignedIssues
     ) {
-        return ResponseEntity.ok(userService.getFilteredUsers(role, sortBy, order, minIssues, maxIssues, company, name));
+        return ResponseEntity.ok(userService.filterUsers(role, sortBy, order, name, email, phoneNumber, company, city, country, minAssignedIssues));
     }
 
     @GetMapping("/admins")
@@ -69,9 +73,9 @@ public class UserController {
 
     @PutMapping("/{userId}/change-password")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse> changePassword(@PathVariable @NotNull Long userId, @RequestBody @Valid ChangePasswordRequest request) {
+    public ResponseEntity<Map<String, String>> changePassword(@PathVariable @NotNull Long userId, @RequestBody @Valid ChangePasswordRequest request) {
         userService.changePassword(request, userId);
-        return ResponseEntity.ok(new ApiResponse("Password changed successfully"));
+        return ResponseEntity.ok(ApiResponse.message("Password changed successfully"));
     }
 
     @PutMapping("/{userId}")
@@ -82,8 +86,8 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'SERVICE_MANAGER')")
-    public ResponseEntity<ApiResponse> deleteUser(@PathVariable @NotNull Long userId) {
+    public ResponseEntity<Map<String, String>> deleteUser(@PathVariable @NotNull Long userId) {
         userService.deleteUser(userId);
-        return ResponseEntity.ok(new ApiResponse("User deleted successfully"));
+        return ResponseEntity.ok(ApiResponse.message("User deleted successfully"));
     }
 }

@@ -1,17 +1,15 @@
 package com.colorlaboratory.serviceportalbackend.validator.user;
 
 import com.colorlaboratory.serviceportalbackend.mapper.user.UserMapper;
-import com.colorlaboratory.serviceportalbackend.model.dto.user.ChangePasswordRequest;
-import com.colorlaboratory.serviceportalbackend.model.dto.user.CreateUserRequest;
+import com.colorlaboratory.serviceportalbackend.model.dto.user.requests.ChangePasswordRequest;
+import com.colorlaboratory.serviceportalbackend.model.dto.user.requests.CreateUserRequest;
 import com.colorlaboratory.serviceportalbackend.model.dto.user.UserDto;
 import com.colorlaboratory.serviceportalbackend.model.entity.user.Role;
 import com.colorlaboratory.serviceportalbackend.model.entity.user.User;
 import com.colorlaboratory.serviceportalbackend.repository.user.UserRepository;
-import com.colorlaboratory.serviceportalbackend.service.user.UserService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
