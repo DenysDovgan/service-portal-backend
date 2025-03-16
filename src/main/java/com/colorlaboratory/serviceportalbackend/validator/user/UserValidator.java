@@ -26,7 +26,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class UserValidator {
-    private final UserService userService;
+    //private final UserService userService;
     private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -48,7 +48,7 @@ public class UserValidator {
 
     public void validateGetUserById(UserDto targetUser) {
         // Fetch current authenticated user
-        UserDto currentUser = userService.getCurrentUser();
+        UserDto currentUser = validateGetCurrentUser();
 
         // Admins can fetch any user, no further validation needed
         if (currentUser.getRole() == Role.ADMIN) {
@@ -133,9 +133,7 @@ public class UserValidator {
         return targetUser;
     }
 
-    public void validateDeleteUser(@NotNull Long userId) {
-        UserDto targetUser = userService.getUserById(userId);
-        UserDto currentUser = userService.getCurrentUser();
+    public void validateDeleteUser(@Valid UserDto targetUser, @Valid UserDto currentUser) {
 
         if (currentUser.getRole() == Role.ADMIN) {
             log.info("Admin {} is deleting user {}", currentUser.getId(), targetUser.getId());
@@ -148,8 +146,7 @@ public class UserValidator {
         }
     }
 
-    public void validateUpdateUser(UserDto targetUser) {
-        UserDto currentUser = userService.getCurrentUser();
+    public void validateUpdateUser(UserDto currentUser, UserDto targetUser) {
         if (currentUser.getRole() == Role.ADMIN) {
             log.info("Admin {} is updating user {}", currentUser.getId(), targetUser.getId());
             return;
@@ -166,8 +163,7 @@ public class UserValidator {
         }
     }
 
-    public void validateGetFilteredUsers(Role role) {
-        UserDto currentUser = userService.getCurrentUser();
+    public void validateGetFilteredUsers(UserDto currentUser, Role role) {
         if (currentUser.getRole() == Role.ADMIN) {
             log.info("Admin {} is fetching users with role {}", currentUser.getId(), role);
             return;

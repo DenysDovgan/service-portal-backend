@@ -9,10 +9,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "issues")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter @Setter
+@NoArgsConstructor @AllArgsConstructor
 @Builder
 public class Issue {
     @Id
@@ -20,7 +18,7 @@ public class Issue {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "client_id", nullable = false)
+    @JoinColumn(name = "created_by", nullable = false)
     private User client;
 
     @Column(nullable = false)

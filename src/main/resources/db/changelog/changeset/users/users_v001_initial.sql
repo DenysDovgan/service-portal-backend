@@ -11,7 +11,7 @@ CREATE TABLE users (
                        city VARCHAR(100) NOT NULL,
                        country VARCHAR(100) NOT NULL,
                        company_name VARCHAR(255) NOT NULL,
-                       role VARCHAR(20) NOT NULL CHECK (role IN ('CLIENT', 'SERVICE_TECHNICIAN', 'SERVICE_MANAGER', 'ADMIN')),
+                       role VARCHAR(20) NOT NULL CHECK (role IN ('CLIENT', 'TECHNICIAN', 'SERVICE_MANAGER', 'ADMIN')),
                        created_at TIMESTAMP DEFAULT NOW(),
                        updated_at TIMESTAMP DEFAULT NOW()
 );

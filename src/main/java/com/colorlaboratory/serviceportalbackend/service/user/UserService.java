@@ -43,7 +43,8 @@ public class UserService {
     }
 
     public List<UserDto> getFilteredUsers(Role role, String sortBy, String order, Integer minIssues, Integer maxIssues, String company, String name) {
-        userValidator.validateGetFilteredUsers(role);
+        UserDto currentUser = getCurrentUser();
+        userValidator.validateGetFilteredUsers(currentUser, role);
         List<User> users = userRepository.findUsersWithFilters(role, sortBy, order, minIssues, maxIssues, company, name);
         return userMapper.toDtoList(users);
     }
@@ -111,7 +112,10 @@ public class UserService {
     public void deleteUser(Long userId) {
         log.info("Deleting user with id: {}", userId);
 
-        userValidator.validateDeleteUser(userId);
+        UserDto currentUser = getCurrentUser();
+        UserDto targetUser = getUserById(userId);
+
+        userValidator.validateDeleteUser(targetUser, currentUser);
 
         userRepository.deleteById(userId);
 
@@ -133,13 +137,10 @@ public class UserService {
     public UserDto updateUser(Long userId, UpdateUserRequest request) {
         log.info("Updating user with id: {}", userId);
 
-        User targetUser = userRepository.findById(userId)
-                .orElseThrow(() -> {
-                    log.error("User with id {} not found", userId);
-                    return new EntityNotFoundException("User with id " + userId + " not found");
-                });
+        User targetUser = getUserEntityById(userId);
+        UserDto currentUser = getCurrentUser();
 
-        userValidator.validateUpdateUser(userMapper.toDto(targetUser));
+        userValidator.validateUpdateUser(currentUser, userMapper.toDto(targetUser));
 
         targetUser.setEmail(request.getEmail());
         targetUser.setPhoneNumber(request.getPhoneNumber());
@@ -151,5 +152,17 @@ public class UserService {
 
         log.info("User with id {} updated successfully", userId);
         return userMapper.toDto(updatedUser);
+    }
+
+    private User getUserEntityById(@NotNull Long userId) {
+        User targetUser = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    log.error("User with id {} not found", userId);
+                    return new EntityNotFoundException("User with id " + userId + " not found");
+                });
+
+        userValidator.validateGetUserById(userMapper.toDto(targetUser));
+
+        return targetUser;
     }
 }
