@@ -23,16 +23,6 @@ repositories {
     mavenCentral()
 }
 
-ext {
-    set("springCloudVersion", "2024.0.0")
-}
-
-dependencyManagement {
-    imports {
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
-    }
-}
-
 dependencies {
     // Starters
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -41,7 +31,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-mail")
-    implementation("org.springframework.cloud:spring-cloud-starter")
+    implementation("com.google.cloud:spring-cloud-gcp-starter-storage:6.1.0")
+
 
     // Authentication
     implementation("io.jsonwebtoken:jjwt-api:0.12.6")

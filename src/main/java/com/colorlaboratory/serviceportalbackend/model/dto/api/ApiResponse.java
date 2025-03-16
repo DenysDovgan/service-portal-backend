@@ -11,5 +11,10 @@ public class ApiResponse {
     }
 
     public static Map<String, String> message(String message) {
-        return  Map.of("message", message);}
+        return  Map.of("message", message);
+    }
+
+    public static Map<String, String> customMessage(String key, String message) {
+        return  Map.of(key, message);
+    }
 }

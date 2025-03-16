@@ -11,6 +11,7 @@ import com.colorlaboratory.serviceportalbackend.repository.issue.IssueRepository
 import com.colorlaboratory.serviceportalbackend.service.media.MediaService;
 import com.colorlaboratory.serviceportalbackend.service.user.UserService;
 import com.colorlaboratory.serviceportalbackend.validator.issue.IssueValidator;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,17 +36,31 @@ public class IssueService {
     public IssueDto create(CreateIssueRequest request) {
         UserDto currentUser = userService.getCurrentUser();
 
-        log.info("Client with id {} is creating an issue", currentUser.getId());
-
         Issue issue = Issue.builder()
                 .createdBy(userMapper.toEntity(currentUser))
                 .title(request.getTitle())
                 .description(request.getDescription())
+                .isPublished(false)
                 .status(IssueStatus.OPEN)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
 
+        log.info("Creating issue for user with id {}", currentUser.getId());
         return issueMapper.toDto(issueRepository.save(issue));
+    }
+
+    @Transactional
+    public void publish(Long issueId) {
+        Issue issue = issueRepository.findById(issueId)
+                .orElseThrow(() -> new EntityNotFoundException("Issue not found"));
+
+        issueValidator.validatePublishIssue(issue);
+
+        issue.setIsPublished(true);
+        issue.setUpdatedAt(LocalDateTime.now());
+
+        issueRepository.save(issue);
+        log.info("Issue with id {} published successfully", issueId);
     }
 }

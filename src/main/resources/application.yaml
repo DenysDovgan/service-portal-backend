@@ -24,9 +24,11 @@ spring:
           ssl:
             enable: true
 
+  cloud:
+    gcp:
+      storage:
+        bucket: ${GCS_BUCKET_NAME}
+
 jwt:
   secret: ${JWT_SECRET}
   expiration-time: ${JWT_EXPIRATION_TIME}
-
-gcs:
-  bucket-name: ${GCS_BUCKET_NAME}

@@ -1,7 +1,6 @@
 package com.colorlaboratory.serviceportalbackend.controller.media;
 
 import com.colorlaboratory.serviceportalbackend.model.dto.api.ApiResponse;
-import com.colorlaboratory.serviceportalbackend.model.dto.media.requests.CreateMediaRequest;
 import com.colorlaboratory.serviceportalbackend.service.media.MediaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,13 +17,21 @@ public class MediaController {
 
     private final MediaService mediaService;
 
-    @PostMapping("{issueId}/upload")
+    // TODO:: check for single file upload
+    @PostMapping("/{issueId}/upload")
     @PreAuthorize("hasAuthority('CLIENT')")
     public ResponseEntity<Map<String, String>> upload(
             @PathVariable Long issueId,
-            @RequestParam("files") MultipartFile[] files
+            @RequestParam("file") MultipartFile file
     ) {
-        mediaService.upload(issueId, files);
-        return ResponseEntity.ok(ApiResponse.message("Media uploaded successfully"));
+        String url = mediaService.upload(issueId, file);
+        return ResponseEntity.ok(ApiResponse.customMessage("url", url));
+    }
+
+    @DeleteMapping("/{mediaId}/delete")
+    @PreAuthorize("hasAuthority('CLIENT')")
+    public ResponseEntity<Map<String, String>> delete(@PathVariable Long mediaId) {
+        mediaService.delete(mediaId);
+        return ResponseEntity.ok(ApiResponse.message("Media deleted successfully"));
     }
 }

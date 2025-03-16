@@ -2,7 +2,10 @@ package com.colorlaboratory.serviceportalbackend.validator.media;
 
 import com.colorlaboratory.serviceportalbackend.model.dto.user.UserDto;
 import com.colorlaboratory.serviceportalbackend.model.entity.issue.Issue;
+import com.colorlaboratory.serviceportalbackend.model.entity.media.Media;
+import com.colorlaboratory.serviceportalbackend.repository.media.MediaRepository;
 import com.colorlaboratory.serviceportalbackend.service.user.UserService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
@@ -16,13 +19,32 @@ import java.util.Objects;
 public class MediaValidator {
 
     private final UserService userService;
+    private final MediaRepository mediaRepository;
 
     public void validateUpload(Issue issue) {
         UserDto currentUser = userService.getCurrentUser();
 
         if (!Objects.equals(issue.getCreatedBy().getId(), currentUser.getId())) {
-            log.error("User with id {} is not allowed to upload media for issue with id {}", currentUser.getId(), issue.getId());
+            log.warn("User with id {} tried to upload media for issue with id {}", currentUser.getId(), issue.getId());
             throw new AccessDeniedException("You are not allowed to upload media for this issue");
+        }
+
+        if (issue.getIsPublished()) {
+            log.warn("User with id {} is not allowed to upload media for published issue with id {}", currentUser.getId(), issue.getId());
+            throw new AccessDeniedException("Cannot upload media. Issue is already published.");
+        }
+    }
+
+    public void validateDelete(Issue issue) {
+        UserDto currentUser = userService.getCurrentUser();
+
+        if (!Objects.equals(issue.getCreatedBy().getId(), currentUser.getId())) {
+            log.warn("User with id {} tried to delete media for issue with id {}", currentUser.getId(), issue.getId());
+            throw new AccessDeniedException("You are not allowed to delete media for this issue");
+        }
+
+        if (issue.getIsPublished()) {
+            throw new AccessDeniedException("Cannot delete media. Issue is already published.");
         }
     }
 }
