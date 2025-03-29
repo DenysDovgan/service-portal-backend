@@ -1,4 +1,4 @@
-package com.colorlaboratory.serviceportalbackend.model.dto.auth;
+package com.colorlaboratory.serviceportalbackend.model.dto.auth.requests;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

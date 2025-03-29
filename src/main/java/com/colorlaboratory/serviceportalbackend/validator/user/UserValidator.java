@@ -24,12 +24,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class UserValidator {
-    //private final UserService userService;
     private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserDto validateGetCurrentUser() {
+    public User validateGetCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String currentUserEmail = authentication.getName();
 
@@ -41,12 +40,12 @@ public class UserValidator {
                 });
 
         log.info("Fetched current user: {}", currentUserEmail);
-        return userMapper.toDto(currentUser);
+        return currentUser;
     }
 
     public void validateGetUserById(UserDto targetUser) {
         // Fetch current authenticated user
-        UserDto currentUser = validateGetCurrentUser();
+        UserDto currentUser = userMapper.toDto(validateGetCurrentUser());
 
         // Admins can fetch any user, no further validation needed
         if (currentUser.getRole() == Role.ADMIN) {
@@ -163,7 +162,7 @@ public class UserValidator {
 
     public void validateGetFilteredUsers(UserDto currentUser, Role role) {
         if (currentUser.getRole() == Role.ADMIN) {
-            log.info("Admin {} is fetching users with role {}", currentUser.getId(), role);
+            log.info("Admin {} is fetching users by filter with role {}", currentUser.getId(), role);
             return;
         }
 

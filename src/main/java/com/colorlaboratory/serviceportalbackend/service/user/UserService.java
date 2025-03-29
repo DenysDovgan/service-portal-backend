@@ -12,7 +12,6 @@ import com.colorlaboratory.serviceportalbackend.service.notification.Notificatio
 import com.colorlaboratory.serviceportalbackend.validator.user.UserValidator;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,29 +30,23 @@ public class UserService {
     private final UserValidator userValidator;
     private final NotificationService notificationService;
 
-    public List<UserDto> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        return userMapper.toDtoList(users);
-    }
-
-    public List<UserDto> getAllAdmins() {
-        List<User> admins = userRepository.findByRole((Role.ADMIN));
-        return userMapper.toDtoList(admins);
-    }
-
     public List<UserDto> filterUsers(Role role, String sortBy, String order, String name, String email, String phoneNumber,
                                      String company, String city, String country, Integer minAssignedIssues) {
-        UserDto currentUser = getCurrentUser();
+        UserDto currentUser = getCurrentUserDto();
         userValidator.validateGetFilteredUsers(currentUser, role);
         List<User> users = userRepository.filterUsers(role, sortBy, order, name, email, phoneNumber, company, city, country, minAssignedIssues);
         return userMapper.toDtoList(users);
     }
 
-    public UserDto getCurrentUser() {
+    public UserDto getCurrentUserDto() {
+        return userMapper.toDto(userValidator.validateGetCurrentUser());
+    }
+
+    public User getCurrentUser() {
         return userValidator.validateGetCurrentUser();
     }
 
-    public UserDto getUserById(@NotNull Long userId) {
+    public UserDto getUserDtoById(Long userId) {
         UserDto targetUser = userMapper.toDto(userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.error("User with id {} not found", userId);
@@ -99,6 +92,7 @@ public class UserService {
         log.info("Initiating password change for user with id: {}", userId);
 
         User targetUser = userValidator.validateChangePassword(request, userId);
+
         targetUser.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(targetUser);
 
@@ -112,8 +106,8 @@ public class UserService {
     public void deleteUser(Long userId) {
         log.info("Deleting user with id: {}", userId);
 
-        UserDto currentUser = getCurrentUser();
-        UserDto targetUser = getUserById(userId);
+        UserDto currentUser = getCurrentUserDto();
+        UserDto targetUser = getUserDtoById(userId);
 
         userValidator.validateDeleteUser(targetUser, currentUser);
 
@@ -138,7 +132,7 @@ public class UserService {
         log.info("Updating user with id: {}", userId);
 
         User targetUser = getUserEntityById(userId);
-        UserDto currentUser = getCurrentUser();
+        UserDto currentUser = getCurrentUserDto();
 
         userValidator.validateUpdateUser(currentUser, userMapper.toDto(targetUser));
 
@@ -154,7 +148,7 @@ public class UserService {
         return userMapper.toDto(updatedUser);
     }
 
-    private User getUserEntityById(@NotNull Long userId) {
+    private User getUserEntityById(Long userId) {
         User targetUser = userRepository.findById(userId)
                 .orElseThrow(() -> {
                     log.error("User with id {} not found", userId);

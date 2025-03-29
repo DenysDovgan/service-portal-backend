@@ -5,12 +5,14 @@ import com.colorlaboratory.serviceportalbackend.model.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
+@SQLRestriction("deleted = false")
 @Table(name = "issues")
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
@@ -30,8 +32,8 @@ public class Issue {
     @Column(name = "description", nullable = false)
     private String description;
 
-    @Column(name = "is_published", nullable = false)
-    private Boolean isPublished;
+    @Column(name = "deleted", nullable = false)
+    private Boolean deleted;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)

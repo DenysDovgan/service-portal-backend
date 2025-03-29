@@ -10,8 +10,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -50,11 +48,5 @@ public class UserDto {
 
     @NotNull
     private Role role;
-
-    @NotNull
-    private LocalDateTime createdAt;
-
-    @NotNull
-    private LocalDateTime updatedAt;
 }
 

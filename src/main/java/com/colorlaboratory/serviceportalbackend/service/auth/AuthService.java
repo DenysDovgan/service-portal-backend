@@ -1,6 +1,6 @@
 package com.colorlaboratory.serviceportalbackend.service.auth;
 
-import com.colorlaboratory.serviceportalbackend.model.dto.auth.LoginRequest;
+import com.colorlaboratory.serviceportalbackend.model.dto.auth.requests.LoginRequest;
 import com.colorlaboratory.serviceportalbackend.model.entity.user.User;
 import com.colorlaboratory.serviceportalbackend.repository.user.UserRepository;
 import com.colorlaboratory.serviceportalbackend.utils.JwtUtil;
@@ -9,8 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -21,7 +19,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
-    public Map<String, String> authenticate(LoginRequest request) {
+    public String authenticate(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> {
                     log.warn("User with email {} not found while trying to log in", request.getEmail());
@@ -33,7 +31,6 @@ public class AuthService {
             throw new BadCredentialsException("Invalid email or password");
         }
 
-        String token = jwtUtil.generateToken(user.getEmail(), user.getRole());
-        return Map.of("token", token);
+        return jwtUtil.generateToken(user.getEmail(), user.getRole());
     }
 }

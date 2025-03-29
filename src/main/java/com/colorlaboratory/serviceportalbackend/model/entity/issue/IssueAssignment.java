@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @Table(name = "issues_assignment")
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
+@Builder
 public class IssueAssignment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
