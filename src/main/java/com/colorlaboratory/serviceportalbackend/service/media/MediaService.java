@@ -1,5 +1,6 @@
 package com.colorlaboratory.serviceportalbackend.service.media;
 
+import com.colorlaboratory.serviceportalbackend.model.dto.media.responses.UploadMediaResponse;
 import com.colorlaboratory.serviceportalbackend.model.entity.issue.Issue;
 import com.colorlaboratory.serviceportalbackend.model.entity.media.Media;
 import com.colorlaboratory.serviceportalbackend.repository.issue.IssueRepository;
@@ -10,12 +11,13 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Service
@@ -30,33 +32,47 @@ public class MediaService {
     private final GcsService cloudStorageService;
 
     @Transactional
-    public String upload(Long issueId, MultipartFile file) {
+    public List<UploadMediaResponse> upload(Long issueId, List<MultipartFile> files) {
         log.info("Uploading medias for issue with id {}", issueId);
         Issue issue = issueRepository.findById(issueId)
                 .orElseThrow(() -> new EntityNotFoundException("Issue not found"));
 
-        mediaValidator.validateUpload(issue);
+        mediaValidator.validateUpload(issue, files.size());
 
-        String fileUrl;
+        List<UploadMediaResponse> mediaResponseList = new ArrayList<>();
 
         try {
-            fileUrl = cloudStorageService.uploadFile(file);
+            for (MultipartFile file : files) {
+                String url = cloudStorageService.uploadFile(file);
+
+                mediaValidator.validateFile(file, issueId, issue.getCreatedBy().getId());
+
+                Media media = Media.builder()
+                        .issue(issue)
+                        .url(url)
+                        .type(file.getContentType())
+                        .size(file.getSize())
+                        .uploadedAt(LocalDateTime.now())
+                        .build();
+
+                media = mediaRepository.save(media);
+
+                UploadMediaResponse uploadMediaResponse = UploadMediaResponse.builder()
+                        .url(url)
+                        .type(media.getType())
+                        .size(media.getSize())
+                        .build();
+
+                mediaResponseList.add(uploadMediaResponse);
+
+                log.info("Media with id {} uploaded for issue with id {}", media.getId(), issueId);
+            }
         } catch (IOException e) {
-            log.error("Error occurred while uploading media for issue with id {}", issueId);
+            log.error("Error occurred while uploading media files for issue with id {}", issueId);
             throw new RuntimeException("Error occurred while uploading media");
         }
 
-        Media media = Media.builder()
-                .issue(issue)
-                .url(fileUrl)
-                .type(file.getContentType())
-                .size(file.getSize())
-                .uploadedAt(LocalDateTime.now())
-                .build();
-
-        mediaRepository.save(media);
-        log.info("Media with url {} uploaded for issue with id {}", fileUrl, issueId);
-        return fileUrl;
+        return mediaResponseList;
     }
 
     @Transactional

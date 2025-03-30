@@ -32,3 +32,18 @@ spring:
 jwt:
   secret: ${JWT_SECRET}
   expiration-time: ${JWT_EXPIRATION_TIME}
+
+media:
+  max-size:
+    photo: 10_485_760 #10MB
+    video: 52_428_800 #50MB
+
+  allowed-mime-types:
+    - image/jpeg
+    - image/png
+    - image/webp
+    - image/gif
+    - image/heic
+    - video/mp4
+    - video/quicktime
+    - video/webm

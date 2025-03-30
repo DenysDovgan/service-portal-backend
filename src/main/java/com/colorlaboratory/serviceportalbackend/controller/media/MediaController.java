@@ -12,6 +12,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/media")
 @RequiredArgsConstructor
@@ -20,17 +22,15 @@ public class MediaController {
 
     private final MediaService mediaService;
 
-    // TODO:: do multi files upload
     @PostMapping("/{issueId}/upload")
     @PreAuthorize("hasAuthority('CLIENT')")
-    public ResponseEntity<ApiResponse<UploadMediaResponse>> upload(
+    public ResponseEntity<ApiResponse<List<UploadMediaResponse>>> upload(
             @PathVariable Long issueId,
-            @RequestParam("file") MultipartFile file
+            @RequestParam("files") List<MultipartFile> files
     ) {
-        String url = mediaService.upload(issueId, file);
         return ResponseEntity.ok(ApiResponse.success(
                 "Media uploaded successfully",
-                new UploadMediaResponse(url)
+                mediaService.upload(issueId, files)
         ));
     }
 
