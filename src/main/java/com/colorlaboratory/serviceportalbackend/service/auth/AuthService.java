@@ -31,6 +31,7 @@ public class AuthService {
             throw new BadCredentialsException("Invalid email or password");
         }
 
+        log.info("User with id: {} logged in successfully", user.getId());
         return jwtUtil.generateToken(user.getEmail(), user.getRole());
     }
 }

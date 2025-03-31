@@ -23,8 +23,9 @@ public class GcsService {
     private String bucketName;
 
 
+    // todo:: add issue id to file name
     public String uploadFile(MultipartFile file) throws IOException {
-        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
         BlobInfo blobInfo = storage.create(
                 BlobInfo.newBuilder(bucketName, fileName).build(),
                 file.getInputStream()
