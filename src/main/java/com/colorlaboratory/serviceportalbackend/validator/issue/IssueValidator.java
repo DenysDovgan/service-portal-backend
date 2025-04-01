@@ -5,8 +5,7 @@ import com.colorlaboratory.serviceportalbackend.model.dto.user.UserDto;
 import com.colorlaboratory.serviceportalbackend.model.entity.issue.Issue;
 import com.colorlaboratory.serviceportalbackend.model.entity.issue.IssueStatus;
 import com.colorlaboratory.serviceportalbackend.model.entity.user.Role;
-import com.colorlaboratory.serviceportalbackend.model.entity.user.User;
-import com.colorlaboratory.serviceportalbackend.repository.issue.IssueAssigmentRepository;
+import com.colorlaboratory.serviceportalbackend.repository.issue.IssueAssignmentRepository;
 import com.colorlaboratory.serviceportalbackend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +20,7 @@ import java.util.Objects;
 public class IssueValidator {
 
     private final UserService userService;
-    private final IssueAssigmentRepository issueAssigmentRepository;
+    private final IssueAssignmentRepository issueAssignmentRepository;
 
 
     public void validateGetIssue(Issue issue, UserDto currentUser) {
@@ -34,7 +33,7 @@ public class IssueValidator {
         }
 
         if (isTechnician) {
-            boolean isAssigned = issueAssigmentRepository.existsByIssueIdAndTechnicianId(issue.getId(), currentUser.getId());
+            boolean isAssigned = issueAssignmentRepository.existsByIssueIdAndTechnicianId(issue.getId(), currentUser.getId());
             if (!isAssigned || issue.getStatus() == IssueStatus.DRAFT) {
                 throw new AccessDeniedException("You can only view assigned published issues");
             }
@@ -83,11 +82,20 @@ public class IssueValidator {
         }
     }
 
-    public void validateAssign(User user) {
-        if (user.getRole() != Role.ADMIN && user.getRole() != Role.SERVICE_MANAGER) {
+    public void validateAssignRequest(Role role) {
+        if (role != Role.ADMIN && role != Role.SERVICE_MANAGER) {
             throw new AccessDeniedException("Only Admin or Service Manager can assign technicians.");
         }
     }
+
+    public void validateAssign(Role technicianRole, Long technicianId,
+                               Role currentUserRole, Long currentUserId) {
+        if (technicianRole == Role.ADMIN) {
+            log.warn("User (id: {}, role: {}) tried to assign and issue to user (id: {}, role: {})",
+                    currentUserId, currentUserRole, technicianId, technicianRole);
+        }
+    }
+
     public void validateFilter(UserDto currentUser, IssueStatus status, Long assignedTo, Long createdBy) {
 
         if (currentUser.getRole() == Role.ADMIN) {

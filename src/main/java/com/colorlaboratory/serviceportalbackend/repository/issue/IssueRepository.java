@@ -1,6 +1,7 @@
 package com.colorlaboratory.serviceportalbackend.repository.issue;
 
 import com.colorlaboratory.serviceportalbackend.model.entity.issue.Issue;
+import com.colorlaboratory.serviceportalbackend.model.entity.issue.IssueStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -25,4 +26,16 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
             @Param("assignedTo") Long assignedTo,
             @Param("createdBy") Long createdBy
     );
+
+    Integer countByStatus(IssueStatus status);
+    
+    long countByDeleted(Boolean deleted);
+    
+    long countByCreatedByIdAndStatusAndDeletedFalse(Long userId, IssueStatus issueStatus);
+
+    long countByCreatedByIdAndDeletedFalse(Long userId);
+
+    long countByStatusAndDeletedFalse(IssueStatus issueStatus);
+
+    long countByDeletedFalse();
 }

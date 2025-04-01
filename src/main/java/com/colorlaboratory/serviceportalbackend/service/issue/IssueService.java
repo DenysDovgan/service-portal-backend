@@ -10,8 +10,9 @@ import com.colorlaboratory.serviceportalbackend.model.entity.issue.Issue;
 import com.colorlaboratory.serviceportalbackend.model.entity.issue.IssueAssignment;
 import com.colorlaboratory.serviceportalbackend.model.entity.issue.IssueStatus;
 import com.colorlaboratory.serviceportalbackend.model.entity.user.User;
-import com.colorlaboratory.serviceportalbackend.repository.issue.IssueAssigmentRepository;
+import com.colorlaboratory.serviceportalbackend.repository.issue.IssueAssignmentRepository;
 import com.colorlaboratory.serviceportalbackend.repository.issue.IssueRepository;
+import com.colorlaboratory.serviceportalbackend.repository.user.UserRepository;
 import com.colorlaboratory.serviceportalbackend.service.user.UserService;
 import com.colorlaboratory.serviceportalbackend.validator.issue.IssueValidator;
 import jakarta.persistence.EntityNotFoundException;
@@ -30,11 +31,12 @@ import java.util.List;
 public class IssueService {
 
     private final IssueRepository issueRepository;
-    private final IssueAssigmentRepository issueAssigmentRepository;
+    private final IssueAssignmentRepository issueAssignmentRepository;
     private final IssueMapper issueMapper;
     private final IssueValidator issueValidator;
 
     private final UserService userService;
+    private final UserRepository userRepository;
 
     public IssueDto get(Long issueId) {
         UserDto currentUser = userService.getCurrentUserDto();
@@ -65,28 +67,39 @@ public class IssueService {
         return issueMapper.toDto(issueRepository.save(issue));
     }
 
+    // TODO: Clean implementation. Unnecessary assignments deletion
     public void assign(Long issueId, AssignTechnicianRequest request) {
         User currentUser = userService.getCurrentUser();
 
         Issue issue = issueRepository.findById(issueId)
                 .orElseThrow(() -> new EntityNotFoundException("Issue not found"));
 
-        issueValidator.validateAssign(currentUser);
+        issueValidator.validateAssignRequest(currentUser.getRole());
 
         // Remove existing assignments
-        issueAssigmentRepository.deleteByIssueId(issueId);
+        issueAssignmentRepository.deleteByIssueId(issueId);
 
         // Create new assignments
         List<IssueAssignment> assignments = request.getTechnicianIds().stream()
-                .map(techId -> IssueAssignment.builder()
-                        .issue(issue)
-                        .technician(User.builder().id(techId).build())
-                        .assignedBy(currentUser)
-                        .assignedAt(LocalDateTime.now())
-                        .build())
+                .map(techId -> {
+                    User technician = userRepository.findById(techId)
+                            .orElseThrow(() -> {
+                                log.warn("Technician (id: {}) not found while trying to assign to issue (id: {})",
+                                        techId, issue.getId());
+                                return new EntityNotFoundException("Technician not found");
+                            });
+                    issueValidator.validateAssign(technician.getRole(), techId, currentUser.getRole(), currentUser.getId());
+
+                    return IssueAssignment.builder()
+                            .issue(issue)
+                            .technician(technician)
+                            .assignedBy(currentUser)
+                            .assignedAt(LocalDateTime.now())
+                            .build();
+                })
                 .toList();
 
-        issueAssigmentRepository.saveAll(assignments);
+        issueAssignmentRepository.saveAll(assignments);
 
         log.info("Issue {} assigned to technicians {} by {}", issueId, request.getTechnicianIds(), currentUser.getId());
     }

@@ -42,4 +42,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
                            @Param("country") String country,
                            @Param("minAssignedIssues") Integer minAssignedIssues);
 
+    Integer countByRole(Role role);
+
+    User getUserById(Long id);
 }
