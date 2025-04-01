@@ -15,11 +15,39 @@ public interface IssueAssignmentRepository extends JpaRepository<IssueAssignment
 
     long countByTechnicianId(Long userId);
 
-    long countByTechnicianIdAndIssueStatus_Open(Long userId);
+    @Query("""
+    SELECT COUNT(ia)
+    FROM IssueAssignment ia
+    WHERE ia.technician.id = :userId
+      AND ia.issue.status = 'OPEN'
+      AND ia.issue.deleted = false
+    """)
+    long countByTechnicianIdAndIssueStatus_Open(@Param("userId") Long userId);
 
-    long countByTechnicianIdAndIssueStatus_InProgress(Long userId);
+    @Query("""
+    SELECT COUNT(ia)
+    FROM IssueAssignment ia
+    WHERE ia.technician.id = :userId
+      AND ia.issue.status = 'IN_PROGRESS'
+      AND ia.issue.deleted = false
+    """)
+    long countByTechnicianIdAndIssueStatus_InProgress(@Param("userId") Long userId);
 
-    long countByTechnicianIdAndIssueStatus_Resolved(Long userId);
+    @Query("""
+    SELECT COUNT(ia)
+    FROM IssueAssignment ia
+    WHERE ia.technician.id = :userId
+      AND ia.issue.status = 'RESOLVED'
+      AND ia.issue.deleted = false
+    """)
+    long countByTechnicianIdAndIssueStatus_Resolved(@Param("userId") Long userId);
 
-    long countByTechnicianIdAndIssueStatus_Closed(Long userId);
+    @Query("""
+    SELECT COUNT(ia)
+    FROM IssueAssignment ia
+    WHERE ia.technician.id = :userId
+      AND ia.issue.status = 'CLOSED'
+      AND ia.issue.deleted = false
+    """)
+    long countByTechnicianIdAndIssueStatus_Closed(@Param("userId") Long userId);
 }

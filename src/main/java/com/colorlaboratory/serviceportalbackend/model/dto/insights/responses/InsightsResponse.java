@@ -12,29 +12,29 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class InsightsResponse {
     // issues
-    private long totalIssuesCount;
-    private long openIssuesCount;
-    private long inProgressIssuesCount;
-    private long resolvedIssuesCount;
-    private long closedIssuesCount;
+    private Long totalIssuesCount;
+    private Long openIssuesCount;
+    private Long inProgressIssuesCount;
+    private Long resolvedIssuesCount;
+    private Long closedIssuesCount;
 
     // users
-    private long totalUsersCount;
-    private long totalAdminsCount;
-    private long totalServiceManagersCount;
-    private long totalTechniciansCount;
-    private long totalClientsCount;
+    private Long totalUsersCount;
+    private Long totalAdminsCount;
+    private Long totalServiceManagersCount;
+    private Long totalTechniciansCount;
+    private Long totalClientsCount;
 
     // insights for staff
-    private long staffMyAssignedIssuesCount;
-    private long staffMyOpenIssuesCount;
-    private long staffMyInProgressIssuesCount;
-    private long staffMyResolvedIssuesCount;
-    private long staffMyClosedIssuesCount;
+    private Long staffMyAssignedIssuesCount;
+    private Long staffMyOpenIssuesCount;
+    private Long staffMyInProgressIssuesCount;
+    private Long staffMyResolvedIssuesCount;
+    private Long staffMyClosedIssuesCount;
 
     // insights for clients
-    private long clientMyTotalIssuesCount;
-    private long clientMyOpenedIssuesCount;
-    private long clientMyInProgressIssuesCount;
-    private long clientMyResolvedIssuesCount;
+    private Long clientMyTotalIssuesCount;
+    private Long clientMyOpenedIssuesCount;
+    private Long clientMyInProgressIssuesCount;
+    private Long clientMyResolvedIssuesCount;
 }

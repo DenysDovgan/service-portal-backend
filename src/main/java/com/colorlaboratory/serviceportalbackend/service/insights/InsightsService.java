@@ -10,8 +10,10 @@ import com.colorlaboratory.serviceportalbackend.repository.issue.IssueRepository
 import com.colorlaboratory.serviceportalbackend.repository.user.UserRepository;
 import com.colorlaboratory.serviceportalbackend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class InsightsService {
@@ -27,13 +29,14 @@ public class InsightsService {
         currentUser = userService.getCurrentUserDto();
         Role role = currentUser.getRole();
 
+        log.info("Fetching insights for user (id: {}, role {})", currentUser.getId(), role);
+
         if (role == Role.CLIENT) {
             return InsightsResponse.builder()
                     .clientMyTotalIssuesCount(count(InsightsMetricType.CLIENT_TOTAL))
                     .clientMyOpenedIssuesCount(count(InsightsMetricType.CLIENT_OPEN))
                     .clientMyInProgressIssuesCount(count(InsightsMetricType.CLIENT_IN_PROGRESS))
                     .clientMyResolvedIssuesCount(count(InsightsMetricType.CLIENT_RESOLVED))
-
                     .build();
         } else if (role == Role.TECHNICIAN) {
             return InsightsResponse.builder()
