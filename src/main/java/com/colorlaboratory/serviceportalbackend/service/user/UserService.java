@@ -30,11 +30,11 @@ public class UserService {
     private final UserValidator userValidator;
     private final NotificationService notificationService;
 
-    public List<UserDto> filterUsers(Role role, String sortBy, String order, String name, String email, String phoneNumber,
+    public List<UserDto> filterUsers(Role role, String sortBy, String order, String name, String email,
                                      String company, String city, String country, Integer minAssignedIssues) {
         UserDto currentUser = getCurrentUserDto();
         userValidator.validateGetFilteredUsers(currentUser, role);
-        List<User> users = userRepository.filterUsers(role, sortBy, order, name, email, phoneNumber, company, city, country, minAssignedIssues);
+        List<User> users = userRepository.filterUsers(role, sortBy, order, name, email, company, city, country, minAssignedIssues);
         return userMapper.toDtoList(users);
     }
 
