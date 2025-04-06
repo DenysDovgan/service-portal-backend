@@ -46,10 +46,6 @@ public class User implements UserDetails {
 
     @Column(nullable = false)
     @Size(min = 1, max = 100)
-    private String city;
-
-    @Column(nullable = false)
-    @Size(min = 1, max = 100)
     private String country;
 
     @Column(name = "company_name")
