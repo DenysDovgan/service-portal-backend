@@ -31,10 +31,10 @@ public class UserService {
     private final NotificationService notificationService;
 
     public List<UserDto> filterUsers(Role role, String sortBy, String order, String name, String email,
-                                     String company, String city, String country, Integer minAssignedIssues) {
+                                     String company, String country, Integer minAssignedIssues) {
         UserDto currentUser = getCurrentUserDto();
         userValidator.validateGetFilteredUsers(currentUser, role);
-        List<User> users = userRepository.filterUsers(role, sortBy, order, name, email, company, city, country, minAssignedIssues);
+        List<User> users = userRepository.filterUsers(role, sortBy, order, name, email, company, country, minAssignedIssues);
         return userMapper.toDtoList(users);
     }
 
@@ -73,7 +73,6 @@ public class UserService {
                 .phoneNumber(request.getPhoneNumber())
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
-                .city(request.getCity())
                 .country(request.getCountry())
                 .companyName(request.getCompanyName())
                 .role(request.getRole())
@@ -138,7 +137,6 @@ public class UserService {
 
         targetUser.setEmail(request.getEmail());
         targetUser.setPhoneNumber(request.getPhoneNumber());
-        targetUser.setCity(request.getCity());
         targetUser.setCountry(request.getCountry());
         targetUser.setCompanyName(request.getCompanyName());
 

@@ -29,10 +29,6 @@ public class CreateUserRequest {
 
     @NotBlank
     @Size(min = 1, max = 100)
-    private String city;
-
-    @NotBlank
-    @Size(min = 1, max = 100)
     private String country;
 
     @Size(max = 255)

@@ -20,7 +20,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "AND (:name IS NULL OR LOWER(u.firstName) LIKE LOWER(CONCAT(:name, '%')) OR LOWER(u.lastName) LIKE LOWER(CONCAT(:name, '%'))) " +
             "AND (:email IS NULL OR u.email LIKE :email%) " +
             "AND (:company IS NULL OR u.companyName LIKE :company%) " +
-            "AND (:city IS NULL OR u.city LIKE :city%) " +
             "AND (:country IS NULL OR u.country LIKE :country%) " +
             "AND (:minAssignedIssues IS NULL OR SIZE(u.assignedIssues) >= :minAssignedIssues) " +
             "ORDER BY " +
@@ -36,7 +35,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
                            @Param("name") String name,
                            @Param("email") String email,
                            @Param("company") String company,
-                           @Param("city") String city,
                            @Param("country") String country,
                            @Param("minAssignedIssues") Integer minAssignedIssues);
 

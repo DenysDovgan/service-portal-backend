@@ -29,9 +29,5 @@ public class IssueDto {
     @NotNull
     private IssueStatus status;
 
-    @NotNull
     private LocalDateTime createdAt;
-
-    @NotNull
-    private LocalDateTime updatedAt;
 }

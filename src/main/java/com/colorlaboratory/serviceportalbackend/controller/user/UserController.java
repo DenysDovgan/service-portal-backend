@@ -36,13 +36,12 @@ public class UserController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String company,
-            @RequestParam(required = false) String city,
             @RequestParam(required = false) String country,
             @RequestParam(required = false) @PositiveOrZero Integer minAssignedIssues
     ) {
         return ResponseEntity.ok(ApiResponse.success(
                 "Users filtered successfully",
-                userService.filterUsers(role, sortBy, order, name, email, company, city, country, minAssignedIssues)
+                userService.filterUsers(role, sortBy, order, name, email, company, country, minAssignedIssues)
         ));
     }
 
