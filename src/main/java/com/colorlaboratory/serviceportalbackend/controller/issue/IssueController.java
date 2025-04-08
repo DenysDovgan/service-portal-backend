@@ -26,6 +26,15 @@ public class IssueController {
 
     private final IssueService issueService;
 
+    @GetMapping
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<List<IssueDto>>> getAll() {
+        return ResponseEntity.ok(ApiResponse.success(
+                "Issues retrieved successfully",
+                issueService.getAll()
+        ));
+    }
+
     @GetMapping("/{issueId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<IssueDto>> get(

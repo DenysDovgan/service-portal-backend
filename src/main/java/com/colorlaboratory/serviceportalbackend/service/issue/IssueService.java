@@ -38,6 +38,22 @@ public class IssueService {
     private final UserService userService;
     private final UserRepository userRepository;
 
+    public List<IssueDto> getAll() {
+        UserDto currentUser = userService.getCurrentUserDto();
+        log.info("User (id: {}, role: {}) is trying to access all issues", currentUser.getId(), currentUser.getRole());
+
+        List<Issue> issues;
+
+        switch (currentUser.getRole()) {
+            case ADMIN, SERVICE_MANAGER -> issues = issueRepository.findAllByDeletedFalseAndStatusNot(IssueStatus.DRAFT);
+            case TECHNICIAN -> issues = issueAssignmentRepository.findAllIssuesByTechnicianIdAndIssueStatusIsNot_DraftAndDeleted_False(currentUser.getId());
+            case CLIENT -> issues = issueRepository.findAllByDeletedFalseAndCreatedBy_Id(currentUser.getId());
+            default -> throw new AccessDeniedException("Access denied");
+        }
+
+        return issueMapper.toDto(issues);
+    }
+
     public IssueDto get(Long issueId) {
         UserDto currentUser = userService.getCurrentUserDto();
         log.info("User {} (role: {}) is trying to access issue {}", currentUser.getId(), currentUser.getRole(), issueId);

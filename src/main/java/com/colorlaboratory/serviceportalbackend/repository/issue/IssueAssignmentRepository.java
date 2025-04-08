@@ -1,15 +1,28 @@
 package com.colorlaboratory.serviceportalbackend.repository.issue;
 
+import com.colorlaboratory.serviceportalbackend.model.entity.issue.Issue;
 import com.colorlaboratory.serviceportalbackend.model.entity.issue.IssueAssignment;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 public interface IssueAssignmentRepository extends JpaRepository<IssueAssignment, Long> {
 
     @Query("SELECT COUNT(a) > 0 FROM IssueAssignment a " +
             "WHERE a.issue.id = :issueId AND a.technician.id = :technicianId")
     boolean existsByIssueIdAndTechnicianId(@Param("issueId") Long issueId, @Param("technicianId") Long technicianId);
+
+    @Query("""
+    SELECT ia.issue
+    FROM IssueAssignment ia
+    WHERE ia.technician.id = :userId
+    AND ia.issue.status != 'DRAFT'
+    AND ia.issue.deleted = false
+    """)
+    List<Issue> findAllIssuesByTechnicianIdAndIssueStatusIsNot_DraftAndDeleted_False(@Param("userId") @NotNull Long id);
 
     void deleteByIssueId(Long issueId);
 

@@ -27,6 +27,8 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
             @Param("createdBy") Long createdBy
     );
 
+    List<Issue> findAllByDeletedFalseAndStatusNot(IssueStatus issueStatus);
+
     Integer countByStatus(IssueStatus status);
     
     long countByDeleted(Boolean deleted);
@@ -38,4 +40,6 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
     long countByStatusAndDeletedFalse(IssueStatus issueStatus);
 
     long countByDeletedFalse();
+
+    List<Issue> findAllByDeletedFalseAndCreatedBy_Id(Long createdById);
 }
