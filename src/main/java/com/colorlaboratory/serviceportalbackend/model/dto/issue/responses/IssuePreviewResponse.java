@@ -15,5 +15,4 @@ public class IssuePreviewResponse {
     private String companyNameCreatedBy;
     private String nameAssignedTo;
     private LocalDateTime createdAt;
-
 }

@@ -95,7 +95,7 @@ public class IssueController {
     }
 
     @PutMapping("/{issueId}/status")
-    @PreAuthorize("hasAuthority('CLIENT')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'SERVICE_MANAGER', 'TECHNICIAN')")
     public ResponseEntity<ApiResponse<IssueDto>> status(
             @PathVariable @NotNull @Positive Long issueId,
             @RequestBody @NotNull @Valid IssueStatusChangeRequest request
