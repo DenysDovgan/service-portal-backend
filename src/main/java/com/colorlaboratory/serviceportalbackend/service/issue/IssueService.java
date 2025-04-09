@@ -5,6 +5,7 @@ import com.colorlaboratory.serviceportalbackend.model.dto.issue.IssueDto;
 import com.colorlaboratory.serviceportalbackend.model.dto.issue.requests.AssignTechnicianRequest;
 import com.colorlaboratory.serviceportalbackend.model.dto.issue.requests.CreateIssueRequest;
 import com.colorlaboratory.serviceportalbackend.model.dto.issue.requests.IssueStatusChangeRequest;
+import com.colorlaboratory.serviceportalbackend.model.dto.issue.responses.IssuePreviewResponse;
 import com.colorlaboratory.serviceportalbackend.model.dto.user.UserDto;
 import com.colorlaboratory.serviceportalbackend.model.entity.issue.Issue;
 import com.colorlaboratory.serviceportalbackend.model.entity.issue.IssueAssignment;
@@ -52,6 +53,16 @@ public class IssueService {
         }
 
         return issueMapper.toDto(issues);
+    }
+
+    public List<IssuePreviewResponse> getAllPreview() {
+        UserDto currentUser = userService.getCurrentUserDto();
+        log.info("User (id: {}, role: {}) is trying to access all issue previews", currentUser.getId(), currentUser.getRole());
+
+        return issueRepository.findPreviewsWithJoins(
+                currentUser.getId(),
+                currentUser.getRole().name()
+        );
     }
 
     public IssueDto get(Long issueId) {

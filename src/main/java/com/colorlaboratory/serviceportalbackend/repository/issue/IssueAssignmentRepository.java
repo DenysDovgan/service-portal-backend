@@ -24,6 +24,14 @@ public interface IssueAssignmentRepository extends JpaRepository<IssueAssignment
     """)
     List<Issue> findAllIssuesByTechnicianIdAndIssueStatusIsNot_DraftAndDeleted_False(@Param("userId") @NotNull Long id);
 
+    @Query("""
+    SELECT ia.technician.firstName || ' ' || ia.technician.lastName
+    FROM IssueAssignment ia
+    WHERE ia.technician.id = :userId
+    """)
+    String findTechnicianNameByIssue_Id(Long issueId);
+
+
     void deleteByIssueId(Long issueId);
 
     long countByTechnicianId(Long userId);

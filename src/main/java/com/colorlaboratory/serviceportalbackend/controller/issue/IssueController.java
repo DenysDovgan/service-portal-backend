@@ -5,6 +5,7 @@ import com.colorlaboratory.serviceportalbackend.model.dto.issue.IssueDto;
 import com.colorlaboratory.serviceportalbackend.model.dto.issue.requests.AssignTechnicianRequest;
 import com.colorlaboratory.serviceportalbackend.model.dto.issue.requests.CreateIssueRequest;
 import com.colorlaboratory.serviceportalbackend.model.dto.issue.requests.IssueStatusChangeRequest;
+import com.colorlaboratory.serviceportalbackend.model.dto.issue.responses.IssuePreviewResponse;
 import com.colorlaboratory.serviceportalbackend.model.entity.issue.IssueStatus;
 import com.colorlaboratory.serviceportalbackend.service.issue.IssueService;
 import jakarta.validation.Valid;
@@ -32,6 +33,15 @@ public class IssueController {
         return ResponseEntity.ok(ApiResponse.success(
                 "Issues retrieved successfully",
                 issueService.getAll()
+        ));
+    }
+
+    @GetMapping("/preview")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<List<IssuePreviewResponse>>> getAllPreview() {
+        return ResponseEntity.ok(ApiResponse.success(
+                "Issues retrieved successfully",
+                issueService.getAllPreview()
         ));
     }
 

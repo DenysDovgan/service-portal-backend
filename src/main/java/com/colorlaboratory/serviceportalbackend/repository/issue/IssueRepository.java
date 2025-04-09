@@ -1,7 +1,9 @@
 package com.colorlaboratory.serviceportalbackend.repository.issue;
 
+import com.colorlaboratory.serviceportalbackend.model.dto.issue.responses.IssuePreviewResponse;
 import com.colorlaboratory.serviceportalbackend.model.entity.issue.Issue;
 import com.colorlaboratory.serviceportalbackend.model.entity.issue.IssueStatus;
+import com.colorlaboratory.serviceportalbackend.model.entity.user.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -27,11 +29,21 @@ public interface IssueRepository extends JpaRepository<Issue, Long> {
             @Param("createdBy") Long createdBy
     );
 
-    List<Issue> findAllByDeletedFalseAndStatusNot(IssueStatus issueStatus);
+    @Query(value = """
+    SELECT new com.colorlaboratory.serviceportalbackend.model.dto.issue.responses.IssuePreviewResponse(
+    i.id, i.title, i.status, cb.companyName, CONCAT(t.firstName, ' ', t.lastName), i.createdAt)
+    FROM Issue i
+    JOIN i.createdBy cb
+    LEFT JOIN i.assignments a
+    LEFT JOIN a.technician t
+    WHERE i.deleted = false
+    AND (:role = 'CLIENT' AND i.createdBy.id = :userId)
+    OR (:role IN ('ADMIN', 'SERVICE_MANAGER') AND i.status != 'DRAFT')
+    OR (:role = 'TECHNICIAN' AND a.technician.id = :userId AND i.status != 'DRAFT')
+   """)
+    List<IssuePreviewResponse> findPreviewsWithJoins(@Param("userId") Long userId, @Param("role") String role);
 
-    Integer countByStatus(IssueStatus status);
-    
-    long countByDeleted(Boolean deleted);
+    List<Issue> findAllByDeletedFalseAndStatusNot(IssueStatus issueStatus);
     
     long countByCreatedByIdAndStatusAndDeletedFalse(Long userId, IssueStatus issueStatus);
 
