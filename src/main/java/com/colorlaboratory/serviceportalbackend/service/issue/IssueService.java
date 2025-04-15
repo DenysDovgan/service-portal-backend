@@ -6,6 +6,8 @@ import com.colorlaboratory.serviceportalbackend.model.dto.issue.requests.AssignT
 import com.colorlaboratory.serviceportalbackend.model.dto.issue.requests.CreateIssueRequest;
 import com.colorlaboratory.serviceportalbackend.model.dto.issue.requests.IssueStatusChangeRequest;
 import com.colorlaboratory.serviceportalbackend.model.dto.issue.responses.IssuePreviewResponse;
+import com.colorlaboratory.serviceportalbackend.model.dto.issue.responses.IssueResponse;
+import com.colorlaboratory.serviceportalbackend.model.dto.media.MediaDto;
 import com.colorlaboratory.serviceportalbackend.model.dto.user.UserDto;
 import com.colorlaboratory.serviceportalbackend.model.entity.issue.Issue;
 import com.colorlaboratory.serviceportalbackend.model.entity.issue.IssueAssignment;
@@ -65,7 +67,7 @@ public class IssueService {
         );
     }
 
-    public IssueDto get(Long issueId) {
+    public IssueResponse get(Long issueId) {
         UserDto currentUser = userService.getCurrentUserDto();
         log.info("User {} (role: {}) is trying to access issue {}", currentUser.getId(), currentUser.getRole(), issueId);
 
@@ -74,7 +76,26 @@ public class IssueService {
 
         issueValidator.validateGetIssue(issue, currentUser);
 
-        return issueMapper.toDto(issue);
+        return IssueResponse.builder()
+                .id(issue.getId())
+                .createdBy(issue.getCreatedBy().getId())
+                .title(issue.getTitle())
+                .description(issue.getDescription())
+                .status(issue.getStatus())
+                .createdAt(issue.getCreatedAt())
+                .updatedAt(issue.getUpdatedAt())
+                .media(issue.getMedia().stream()
+                        .map(m -> MediaDto.builder()
+                                .id(m.getId())
+                                .issueId(issue.getId())
+                                .url(m.getUrl())
+                                .type(m.getType())
+                                .size(m.getSize())
+                                .uploadedAt(m.getUploadedAt())
+                                .build())
+                        .toList()
+                )
+                .build();
     }
 
     @Transactional
@@ -86,6 +107,7 @@ public class IssueService {
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .status(IssueStatus.DRAFT)
+                .deleted(false)
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();

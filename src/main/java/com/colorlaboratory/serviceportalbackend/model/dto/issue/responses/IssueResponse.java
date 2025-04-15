@@ -1,10 +1,9 @@
-package com.colorlaboratory.serviceportalbackend.model.dto.issue;
+package com.colorlaboratory.serviceportalbackend.model.dto.issue.responses;
 
 import com.colorlaboratory.serviceportalbackend.model.dto.media.MediaDto;
 import com.colorlaboratory.serviceportalbackend.model.entity.issue.IssueStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,8 +12,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class IssueDto {
-
+public class IssueResponse {
     @NotNull
     private Long id;
 
@@ -22,7 +20,6 @@ public class IssueDto {
     private Long createdBy;
 
     @NotBlank
-    @Size(min = 1, max = 255)
     private String title;
 
     @NotBlank
@@ -33,4 +30,9 @@ public class IssueDto {
 
     @NotNull
     private LocalDateTime createdAt;
+
+    @NotNull
+    private LocalDateTime updatedAt;
+
+    private List<MediaDto> media;
 }

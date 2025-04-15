@@ -6,6 +6,7 @@ import com.colorlaboratory.serviceportalbackend.model.dto.issue.requests.AssignT
 import com.colorlaboratory.serviceportalbackend.model.dto.issue.requests.CreateIssueRequest;
 import com.colorlaboratory.serviceportalbackend.model.dto.issue.requests.IssueStatusChangeRequest;
 import com.colorlaboratory.serviceportalbackend.model.dto.issue.responses.IssuePreviewResponse;
+import com.colorlaboratory.serviceportalbackend.model.dto.issue.responses.IssueResponse;
 import com.colorlaboratory.serviceportalbackend.model.entity.issue.IssueStatus;
 import com.colorlaboratory.serviceportalbackend.service.issue.IssueService;
 import jakarta.validation.Valid;
@@ -47,7 +48,7 @@ public class IssueController {
 
     @GetMapping("/{issueId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<IssueDto>> get(
+    public ResponseEntity<ApiResponse<IssueResponse>> get(
             @PathVariable @NotNull @Positive Long issueId
     ) {
         return ResponseEntity.ok(ApiResponse.success(
@@ -68,8 +69,6 @@ public class IssueController {
                 issueService.filter(status, assignedTo, createdBy)
         ));
     }
-
-
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('CLIENT')")
@@ -95,7 +94,8 @@ public class IssueController {
     }
 
     @PutMapping("/{issueId}/status")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'SERVICE_MANAGER', 'TECHNICIAN')")
+    @PreAuthorize("isAuthenticated()")
+    // todo: change issues dto to issue response. change role validation
     public ResponseEntity<ApiResponse<IssueDto>> status(
             @PathVariable @NotNull @Positive Long issueId,
             @RequestBody @NotNull @Valid IssueStatusChangeRequest request
