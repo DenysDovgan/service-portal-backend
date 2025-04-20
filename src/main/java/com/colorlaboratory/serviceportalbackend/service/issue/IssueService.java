@@ -8,6 +8,7 @@ import com.colorlaboratory.serviceportalbackend.model.dto.issue.requests.IssueSt
 import com.colorlaboratory.serviceportalbackend.model.dto.issue.responses.IssuePreviewResponse;
 import com.colorlaboratory.serviceportalbackend.model.dto.issue.responses.IssueResponse;
 import com.colorlaboratory.serviceportalbackend.model.dto.media.MediaDto;
+import com.colorlaboratory.serviceportalbackend.model.dto.media.MediaViewDto;
 import com.colorlaboratory.serviceportalbackend.model.dto.user.UserDto;
 import com.colorlaboratory.serviceportalbackend.model.entity.issue.Issue;
 import com.colorlaboratory.serviceportalbackend.model.entity.issue.IssueAssignment;
@@ -16,6 +17,8 @@ import com.colorlaboratory.serviceportalbackend.model.entity.user.User;
 import com.colorlaboratory.serviceportalbackend.repository.issue.IssueAssignmentRepository;
 import com.colorlaboratory.serviceportalbackend.repository.issue.IssueRepository;
 import com.colorlaboratory.serviceportalbackend.repository.user.UserRepository;
+import com.colorlaboratory.serviceportalbackend.service.gcs.GcsService;
+import com.colorlaboratory.serviceportalbackend.service.media.MediaService;
 import com.colorlaboratory.serviceportalbackend.service.user.UserService;
 import com.colorlaboratory.serviceportalbackend.validator.issue.IssueValidator;
 import jakarta.persistence.EntityNotFoundException;
@@ -40,6 +43,8 @@ public class IssueService {
 
     private final UserService userService;
     private final UserRepository userRepository;
+    private final GcsService gcsService;
+    private final MediaService mediaService;
 
     public List<IssueDto> getAll() {
         UserDto currentUser = userService.getCurrentUserDto();
@@ -85,16 +90,15 @@ public class IssueService {
                 .createdAt(issue.getCreatedAt())
                 .updatedAt(issue.getUpdatedAt())
                 .media(issue.getMedia().stream()
-                        .map(m -> MediaDto.builder()
+                        .map(m -> MediaViewDto.builder()
                                 .id(m.getId())
                                 .issueId(issue.getId())
-                                .url(m.getUrl())
                                 .type(m.getType())
                                 .size(m.getSize())
                                 .uploadedAt(m.getUploadedAt())
+                                .signedUrl(mediaService.getSignedUrl(m))
                                 .build())
-                        .toList()
-                )
+                        .toList())
                 .build();
     }
 
@@ -171,7 +175,7 @@ public class IssueService {
 
 
     @Transactional
-    public IssueDto status(Long issueId, IssueStatusChangeRequest request) {
+    public void changeStatus(Long issueId, IssueStatusChangeRequest request) {
         Issue issue = issueRepository.findById(issueId)
                 .orElseThrow(() -> new EntityNotFoundException("Issue not found"));
 
@@ -180,10 +184,8 @@ public class IssueService {
         issue.setStatus(request.getStatus());
         issue.setUpdatedAt(LocalDateTime.now());
 
-        IssueDto issueDto = issueMapper.toDto(issueRepository.save(issue));
+        issueRepository.save(issue);
         log.info("Issue with id {} published successfully", issueId);
-
-        return issueDto;
     }
 
     @Transactional

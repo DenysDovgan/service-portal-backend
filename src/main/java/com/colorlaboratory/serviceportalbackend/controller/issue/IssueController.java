@@ -95,14 +95,14 @@ public class IssueController {
 
     @PutMapping("/{issueId}/status")
     @PreAuthorize("isAuthenticated()")
-    // todo: change issues dto to issue response. change role validation
-    public ResponseEntity<ApiResponse<IssueDto>> status(
+    public ResponseEntity<ApiResponse<Object>> status(
             @PathVariable @NotNull @Positive Long issueId,
             @RequestBody @NotNull @Valid IssueStatusChangeRequest request
-            ) {
+    ) {
+        issueService.changeStatus(issueId, request);
         return ResponseEntity.ok(ApiResponse.success(
                 "Issue status changed successfully",
-                issueService.status(issueId, request)
+                null
         ));
     }
 

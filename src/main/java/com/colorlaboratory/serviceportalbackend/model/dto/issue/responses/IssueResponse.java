@@ -1,6 +1,6 @@
 package com.colorlaboratory.serviceportalbackend.model.dto.issue.responses;
 
-import com.colorlaboratory.serviceportalbackend.model.dto.media.MediaDto;
+import com.colorlaboratory.serviceportalbackend.model.dto.media.MediaViewDto;
 import com.colorlaboratory.serviceportalbackend.model.entity.issue.IssueStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -34,5 +34,5 @@ public class IssueResponse {
     @NotNull
     private LocalDateTime updatedAt;
 
-    private List<MediaDto> media;
+    private List<MediaViewDto> media;
 }

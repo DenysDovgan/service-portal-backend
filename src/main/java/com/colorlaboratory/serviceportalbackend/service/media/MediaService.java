@@ -31,6 +31,12 @@ public class MediaService {
     private final IssueRepository issueRepository;
     private final GcsService cloudStorageService;
 
+    public String getSignedUrl(Media media) {
+        log.info("Generating signed URL for media with id {}", media.getId());
+
+        return cloudStorageService.generateSignedUrl(media.getUrl(), 15);
+    }
+
     @Transactional
     public List<UploadMediaResponse> upload(Long issueId, List<MultipartFile> files) {
         log.info("Uploading medias for issue with id {}", issueId);

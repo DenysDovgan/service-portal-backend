@@ -62,8 +62,8 @@ public class IssueValidator {
 
         // Clients restrictions
         if (currentUser.getRole() == Role.CLIENT) {
-            if (newStatus != IssueStatus.OPEN && newStatus != IssueStatus.DRAFT) {
-                throw new AccessDeniedException("Clients can only change status to OPEN or DRAFT.");
+            if (currentStatus == IssueStatus.DRAFT && newStatus != IssueStatus.OPEN) {
+                throw new AccessDeniedException("Clients can only change status form DRAFT to OPEN.");
             }
         }
 

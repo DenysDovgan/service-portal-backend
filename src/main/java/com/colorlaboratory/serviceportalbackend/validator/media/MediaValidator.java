@@ -6,6 +6,7 @@ import com.colorlaboratory.serviceportalbackend.exceptions.media.UnsupportedMime
 import com.colorlaboratory.serviceportalbackend.model.dto.user.UserDto;
 import com.colorlaboratory.serviceportalbackend.model.entity.issue.Issue;
 import com.colorlaboratory.serviceportalbackend.model.entity.issue.IssueStatus;
+import com.colorlaboratory.serviceportalbackend.model.entity.media.Media;
 import com.colorlaboratory.serviceportalbackend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
