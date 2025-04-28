@@ -1,16 +1,16 @@
 package com.colorlaboratory.serviceportalbackend.service.gcs;
 
-import com.google.cloud.storage.BlobId;
-import com.google.cloud.storage.BlobInfo;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
+import com.google.cloud.storage.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.time.Duration;
 import java.util.UUID;
@@ -27,6 +27,17 @@ public class GcsService {
     private String bucketName;
 
 
+    public InputStream downloadFile(String fileUrl) throws FileNotFoundException {
+        String objectName = extractFileNameFromUrl(fileUrl);
+        Blob blob = storage.get(bucketName, objectName);
+
+        if (blob == null || !blob.exists()) {
+            throw new FileNotFoundException("File not found in GCS");
+        }
+
+        return new ByteArrayInputStream(blob.getContent());
+    }
+
     // todo:: add issue id to file name
     public String uploadFile(MultipartFile file) throws IOException {
         String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
@@ -36,23 +47,6 @@ public class GcsService {
         );
         return blobInfo.getMediaLink();
     }
-
-    public String generateSignedUrl(String fileUrl, int durationInMinutes) {
-        String fileName = extractFileNameFromUrl(fileUrl);
-
-        BlobInfo blobInfo = BlobInfo.newBuilder(BlobId.of(bucketName, fileName)).build();
-
-        URL signedUrl = storage.signUrl(
-                blobInfo,
-                durationInMinutes,
-                TimeUnit.MINUTES,
-                Storage.SignUrlOption.withV4Signature()
-        );
-
-        log.info("Generated signed URL for {} valid for {} minutes", fileName, durationInMinutes);
-        return signedUrl.toString();
-    }
-
 
     public void deleteFile(String fileUrl) {
         String fileName = extractFileNameFromUrl(fileUrl);
@@ -68,7 +62,7 @@ public class GcsService {
         }
     }
 
-    private String extractFileNameFromUrl(String fileUrl) {
+    public static String extractFileNameFromUrl(String fileUrl) {
         // Remove query parameters (everything after '?')
         String cleanUrl = fileUrl.split("\\?")[0];
 

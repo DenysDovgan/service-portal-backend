@@ -1,6 +1,7 @@
 package com.colorlaboratory.serviceportalbackend.exceptions;
 
 import com.colorlaboratory.serviceportalbackend.exceptions.media.FileSizeLimitExceededException;
+import com.colorlaboratory.serviceportalbackend.exceptions.media.GcsMediaFileNotFoundException;
 import com.colorlaboratory.serviceportalbackend.exceptions.media.UnsupportedMimeTypeException;
 import com.colorlaboratory.serviceportalbackend.model.dto.api.responses.ApiResponse;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -49,6 +50,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Object>> handleUsernameNotFound(UsernameNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
                 ApiResponse.error("User is not found.")
+        );
+    }
+
+    @ExceptionHandler(GcsMediaFileNotFoundException.class)
+    public ResponseEntity<ApiResponse<Object>> gcsMediaFileNotFound(GcsMediaFileNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                ApiResponse.error("Media file was not found.")
         );
     }
 

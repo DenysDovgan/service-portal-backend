@@ -1,5 +1,8 @@
 package com.colorlaboratory.serviceportalbackend.service.media;
 
+import com.colorlaboratory.serviceportalbackend.exceptions.media.GcsMediaFileNotFoundException;
+import com.colorlaboratory.serviceportalbackend.model.dto.media.DownloadMediaDto;
+import com.colorlaboratory.serviceportalbackend.model.dto.media.MediaPreviewDto;
 import com.colorlaboratory.serviceportalbackend.model.dto.media.responses.UploadMediaResponse;
 import com.colorlaboratory.serviceportalbackend.model.entity.issue.Issue;
 import com.colorlaboratory.serviceportalbackend.model.entity.media.Media;
@@ -11,10 +14,13 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,10 +37,32 @@ public class MediaService {
     private final IssueRepository issueRepository;
     private final GcsService cloudStorageService;
 
-    public String getSignedUrl(Media media) {
-        log.info("Generating signed URL for media with id {}", media.getId());
+    public List<MediaPreviewDto> getPreviewsByIssueId(Long issueId) {
+        log.info("Getting media previews for issue with id {}", issueId);
+        List<Media> mediaList = mediaRepository.findAllByIssue_Id(issueId);
+        return mediaList.stream()
+                .map(media -> MediaPreviewDto.builder()
+                        .id(media.getId())
+                        .type(media.getType())
+                        .size(media.getSize())
+                        .build())
+                .toList();
+    }
 
-        return cloudStorageService.generateSignedUrl(media.getUrl(), 15);
+    public DownloadMediaDto download(Long mediaId) {
+        log.info("Downloading media with id {}", mediaId);
+        Media media = mediaRepository.findById(mediaId)
+                .orElseThrow(() -> new EntityNotFoundException("Media not found"));
+
+        InputStream stream = null;
+
+        try {
+            stream = cloudStorageService.downloadFile(media.getUrl());
+        } catch (FileNotFoundException e) {
+            throw new GcsMediaFileNotFoundException("Media file not found");
+        }
+
+        return new DownloadMediaDto(stream, media.getType(), GcsService.extractFileNameFromUrl(media.getUrl()));
     }
 
     @Transactional
