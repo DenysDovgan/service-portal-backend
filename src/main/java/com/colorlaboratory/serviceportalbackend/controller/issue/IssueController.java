@@ -1,6 +1,5 @@
 package com.colorlaboratory.serviceportalbackend.controller.issue;
 
-import com.colorlaboratory.serviceportalbackend.model.dto.api.responses.ApiResponse;
 import com.colorlaboratory.serviceportalbackend.model.dto.issue.IssueDto;
 import com.colorlaboratory.serviceportalbackend.model.dto.issue.requests.AssignTechnicianRequest;
 import com.colorlaboratory.serviceportalbackend.model.dto.issue.requests.CreateIssueRequest;
@@ -30,91 +29,77 @@ public class IssueController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<List<IssueDto>>> getAll() {
-        return ResponseEntity.ok(ApiResponse.success(
-                "Issues retrieved successfully",
+    public ResponseEntity<List<IssueDto>> getAll() {
+        return ResponseEntity.ok(
                 issueService.getAll()
-        ));
+        );
     }
 
     @GetMapping("/preview")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<List<IssuePreviewResponse>>> getAllPreview() {
-        return ResponseEntity.ok(ApiResponse.success(
-                "Issues retrieved successfully",
+    public ResponseEntity<List<IssuePreviewResponse>> getAllPreview() {
+        return ResponseEntity.ok(
                 issueService.getAllPreview()
-        ));
+        );
     }
 
     @GetMapping("/{issueId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<IssueResponse>> get(
+    public ResponseEntity<IssueResponse> get(
             @PathVariable @NotNull @Positive Long issueId
     ) {
-        return ResponseEntity.ok(ApiResponse.success(
-                "Issue retrieved successfully",
+        return ResponseEntity.ok(
                 issueService.get(issueId)
-        ));
+        );
     }
 
     @GetMapping("/filter")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<List<IssueDto>>> filter(
+    public ResponseEntity<List<IssueDto>> filter(
             @RequestParam(required = false) IssueStatus status,
             @RequestParam(required = false) Long assignedTo,
             @RequestParam(required = false) Long createdBy
     ) {
-        return ResponseEntity.ok(ApiResponse.success(
-                "Issues filtered successfully",
+        return ResponseEntity.ok(
                 issueService.filter(status, assignedTo, createdBy)
-        ));
+        );
     }
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('CLIENT')")
-    public ResponseEntity<ApiResponse<IssueDto>> create(
+    public ResponseEntity<IssueDto> create(
             @RequestBody @NotNull @Valid CreateIssueRequest request
     ) {
-        return ResponseEntity.ok(ApiResponse.success(
-                "Issue created successfully",
+        return ResponseEntity.ok(
                 issueService.create(request)
-        ));
+        );
     }
 
     @PutMapping("/{issueId}/assign")
-    public ResponseEntity<ApiResponse<Object>> assign(
+    public ResponseEntity<IssueDto> assign(
             @PathVariable @NotNull @Positive Long issueId,
             @RequestBody @NotNull @Valid AssignTechnicianRequest request
     ) {
-        issueService.assign(issueId, request);
-        return ResponseEntity.ok(ApiResponse.success(
-                "Issue assigned successfully",
-                null
-        ));
+        return ResponseEntity.ok(issueService.assign(issueId, request));
     }
 
     @PutMapping("/{issueId}/status")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<Object>> status(
+    public ResponseEntity<IssueDto> status(
             @PathVariable @NotNull @Positive Long issueId,
             @RequestBody @NotNull @Valid IssueStatusChangeRequest request
     ) {
-        issueService.changeStatus(issueId, request);
-        return ResponseEntity.ok(ApiResponse.success(
-                "Issue status changed successfully",
-                null
-        ));
+        return ResponseEntity.ok(
+                issueService.changeStatus(issueId, request)
+        );
     }
 
     @DeleteMapping("/{issueId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<Object>> delete(
+    public ResponseEntity<Void> delete(
             @PathVariable @NotNull @Positive Long issueId
     ) {
         issueService.delete(issueId);
-        return ResponseEntity.ok(ApiResponse.success(
-                "Issue has been deleted",
-                null
-        ));
+        return ResponseEntity.noContent().build();
     }
 }

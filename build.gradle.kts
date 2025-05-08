@@ -49,6 +49,9 @@ dependencies {
     // Storage
     implementation("com.google.cloud:google-cloud-storage:2.50.0")
 
+    // Docs
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6")
+
     // env variables
     implementation("me.paulschwarz:spring-dotenv:4.0.0")
 

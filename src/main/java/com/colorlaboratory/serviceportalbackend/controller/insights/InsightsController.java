@@ -1,6 +1,5 @@
 package com.colorlaboratory.serviceportalbackend.controller.insights;
 
-import com.colorlaboratory.serviceportalbackend.model.dto.api.responses.ApiResponse;
 import com.colorlaboratory.serviceportalbackend.model.dto.insights.responses.InsightsResponse;
 import com.colorlaboratory.serviceportalbackend.service.insights.InsightsService;
 import lombok.RequiredArgsConstructor;
@@ -19,10 +18,9 @@ public class InsightsController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<InsightsResponse>> getInsights() {
-        return ResponseEntity.ok(ApiResponse.success(
-                "Insights retrieved successfully",
+    public ResponseEntity<InsightsResponse> getInsights() {
+        return ResponseEntity.ok(
                 insightsService.getInsights()
-        ));
+        );
     }
 }

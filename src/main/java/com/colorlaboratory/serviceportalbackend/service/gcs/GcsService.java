@@ -11,10 +11,7 @@ import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.time.Duration;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +26,7 @@ public class GcsService {
 
     public InputStream downloadFile(String fileUrl) throws FileNotFoundException {
         String objectName = extractFileNameFromUrl(fileUrl);
+        log.info("Downloading file from GCS: {}", objectName);
         Blob blob = storage.get(bucketName, objectName);
 
         if (blob == null || !blob.exists()) {
@@ -38,9 +36,8 @@ public class GcsService {
         return new ByteArrayInputStream(blob.getContent());
     }
 
-    // todo:: add issue id to file name
-    public String uploadFile(MultipartFile file) throws IOException {
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+    public String uploadFile(MultipartFile file, Long issueId) throws IOException {
+        String fileName = UUID.randomUUID() + "_" + issueId;
         BlobInfo blobInfo = storage.create(
                 BlobInfo.newBuilder(bucketName, fileName).build(),
                 file.getInputStream()

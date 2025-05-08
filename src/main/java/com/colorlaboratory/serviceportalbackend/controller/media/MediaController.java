@@ -1,10 +1,8 @@
 package com.colorlaboratory.serviceportalbackend.controller.media;
 
-import com.colorlaboratory.serviceportalbackend.model.dto.api.responses.ApiResponse;
 import com.colorlaboratory.serviceportalbackend.model.dto.media.DownloadMediaDto;
 import com.colorlaboratory.serviceportalbackend.model.dto.media.responses.UploadMediaResponse;
 import com.colorlaboratory.serviceportalbackend.service.media.MediaService;
-import com.google.protobuf.Api;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +26,9 @@ public class MediaController {
 
     private final MediaService mediaService;
 
-    public ResponseEntity<ApiResponse<Resource>> download(
+    @GetMapping("/{mediaId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Resource> download(
             @PathVariable @NotNull @Positive Long mediaId
     ) {
         DownloadMediaDto media = mediaService.download(mediaId);
@@ -36,33 +36,28 @@ public class MediaController {
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(media.getContentType()))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + media.getFileName() + "\"")
-                .body(ApiResponse.success(
-                        "Media downloaded successfully",
+                .body(
                         new InputStreamResource(media.getInputStream())
-                ));
+                );
     }
 
     @PostMapping("/{issueId}/upload")
     @PreAuthorize("hasAuthority('CLIENT')")
-    public ResponseEntity<ApiResponse<List<UploadMediaResponse>>> upload(
+    public ResponseEntity<List<UploadMediaResponse>> upload(
             @PathVariable Long issueId,
             @RequestParam("files") List<MultipartFile> files
     ) {
-        return ResponseEntity.ok(ApiResponse.success(
-                "Media uploaded successfully",
+        return ResponseEntity.ok(
                 mediaService.upload(issueId, files)
-        ));
+        );
     }
 
     @DeleteMapping("/{mediaId}/delete")
     @PreAuthorize("hasAuthority('CLIENT')")
-    public ResponseEntity<ApiResponse<Object>> delete(
+    public ResponseEntity<Void> delete(
             @PathVariable @NotNull @Positive Long mediaId
     ) {
         mediaService.delete(mediaId);
-        return ResponseEntity.ok(ApiResponse.success(
-                "Media deleted successfully",
-                null
-        ));
+        return ResponseEntity.noContent().build();
     }
 }

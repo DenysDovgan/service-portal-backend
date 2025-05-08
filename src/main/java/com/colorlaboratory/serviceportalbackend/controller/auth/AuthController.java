@@ -1,6 +1,5 @@
 package com.colorlaboratory.serviceportalbackend.controller.auth;
 
-import com.colorlaboratory.serviceportalbackend.model.dto.api.responses.ApiResponse;
 import com.colorlaboratory.serviceportalbackend.model.dto.auth.requests.LoginRequest;
 import com.colorlaboratory.serviceportalbackend.model.dto.auth.responses.LoginResponse;
 import com.colorlaboratory.serviceportalbackend.service.auth.AuthService;
@@ -25,13 +24,12 @@ public class AuthController {
 
     // TODO: 403 -> 401 if failed
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LoginResponse>> login(
+    public ResponseEntity<LoginResponse> login(
             @RequestBody @Valid LoginRequest loginRequest
     ) {
         log.info("Login request received for user with email {}", loginRequest.getEmail());
-        return ResponseEntity.ok(ApiResponse.success(
-                "Logged in successfully",
+        return ResponseEntity.ok(
                 new LoginResponse(authService.authenticate(loginRequest))
-        ));
+        );
     }
 }

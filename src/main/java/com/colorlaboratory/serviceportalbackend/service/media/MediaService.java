@@ -14,7 +14,6 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -54,7 +53,7 @@ public class MediaService {
         Media media = mediaRepository.findById(mediaId)
                 .orElseThrow(() -> new EntityNotFoundException("Media not found"));
 
-        InputStream stream = null;
+        InputStream stream;
 
         try {
             stream = cloudStorageService.downloadFile(media.getUrl());
@@ -77,7 +76,7 @@ public class MediaService {
 
         try {
             for (MultipartFile file : files) {
-                String url = cloudStorageService.uploadFile(file);
+                String url = cloudStorageService.uploadFile(file, issueId);
 
                 mediaValidator.validateFile(file, issueId, issue.getCreatedBy().getId());
 

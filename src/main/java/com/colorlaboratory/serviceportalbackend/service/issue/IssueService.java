@@ -108,7 +108,8 @@ public class IssueService {
     }
 
     // TODO: Clean implementation. Unnecessary assignments deletion
-    public void assign(Long issueId, AssignTechnicianRequest request) {
+    @Transactional
+    public IssueDto assign(Long issueId, AssignTechnicianRequest request) {
         User currentUser = userService.getCurrentUser();
 
         Issue issue = issueRepository.findById(issueId)
@@ -142,6 +143,7 @@ public class IssueService {
         issueAssignmentRepository.saveAll(assignments);
 
         log.info("Issue {} assigned to technicians {} by {}", issueId, request.getTechnicianIds(), currentUser.getId());
+        return issueMapper.toDto(issue);
     }
 
     public List<IssueDto> filter(IssueStatus status, Long assignedTo, Long createdBy) {
@@ -162,7 +164,7 @@ public class IssueService {
 
 
     @Transactional
-    public void changeStatus(Long issueId, IssueStatusChangeRequest request) {
+    public IssueDto changeStatus(Long issueId, IssueStatusChangeRequest request) {
         Issue issue = issueRepository.findById(issueId)
                 .orElseThrow(() -> new EntityNotFoundException("Issue not found"));
 
@@ -173,6 +175,7 @@ public class IssueService {
 
         issueRepository.save(issue);
         log.info("Issue with id {} published successfully", issueId);
+        return issueMapper.toDto(issue);
     }
 
     @Transactional

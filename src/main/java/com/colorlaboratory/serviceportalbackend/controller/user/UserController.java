@@ -1,6 +1,5 @@
 package com.colorlaboratory.serviceportalbackend.controller.user;
 
-import com.colorlaboratory.serviceportalbackend.model.dto.api.responses.ApiResponse;
 import com.colorlaboratory.serviceportalbackend.model.dto.user.requests.ChangePasswordRequest;
 import com.colorlaboratory.serviceportalbackend.model.dto.user.requests.CreateUserRequest;
 import com.colorlaboratory.serviceportalbackend.model.dto.user.requests.UpdateUserRequest;
@@ -29,7 +28,7 @@ public class UserController {
 
     @GetMapping("/filter")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'SERVICE_MANAGER')")
-    public ResponseEntity<ApiResponse<List<UserDto>>> filterUsers(
+    public ResponseEntity<List<UserDto>> filterUsers(
             @RequestParam(required = false) Role role,
             @RequestParam(required = false) String sortBy,
             @RequestParam(required = false, defaultValue = "asc") String order,
@@ -39,77 +38,65 @@ public class UserController {
             @RequestParam(required = false) String country,
             @RequestParam(required = false) @PositiveOrZero Integer minAssignedIssues
     ) {
-        return ResponseEntity.ok(ApiResponse.success(
-                "Users filtered successfully",
+        return ResponseEntity.ok(
                 userService.filterUsers(role, sortBy, order, name, email, company, country, minAssignedIssues)
-        ));
+        );
     }
 
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<UserDto>> getCurrentUser() {
-        return ResponseEntity.ok(ApiResponse.success(
-                "User retrieved successfully",
+    public ResponseEntity<UserDto> getCurrentUser() {
+        return ResponseEntity.ok(
                 userService.getCurrentUserDto()
-        ));
+        );
     }
 
     @GetMapping("/{userId}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'SERVICE_MANAGER', 'TECHNICIAN')")
-    public ResponseEntity<ApiResponse<UserDto>> getUserById(
+    public ResponseEntity<UserDto> getUserById(
             @PathVariable @NotNull @Positive Long userId
     ) {
-        return ResponseEntity.ok(ApiResponse.success(
-                "User retrieved successfully",
+        return ResponseEntity.ok(
                 userService.getUserDtoById(userId)
-        ));
+        );
     }
 
     @PostMapping("/create")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'SERVICE_MANAGER', 'TECHNICIAN')")
-    public ResponseEntity<ApiResponse<UserDto>> createUser(
+    public ResponseEntity<UserDto> createUser(
             @RequestBody @NotNull @Valid CreateUserRequest request
     ) {
-        return ResponseEntity.ok(ApiResponse.success(
-                "User created successfully",
+        return ResponseEntity.ok(
                 userService.createUser(request)
-        ));
+        );
     }
 
     @PutMapping("/{userId}/change-password")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<Object>> changePassword(
+    public ResponseEntity<UserDto> changePassword(
             @PathVariable @NotNull @Positive Long userId,
             @RequestBody @NotNull @Valid ChangePasswordRequest request
     ) {
-        userService.changePassword(request, userId);
-        return ResponseEntity.ok(ApiResponse.success(
-                "Password changed successfully",
-                null
-        ));
+        return ResponseEntity.ok(userService.changePassword(request, userId));
     }
 
     @PutMapping("/{userId}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'SERVICE_MANAGER')")
-    public ResponseEntity<ApiResponse<UserDto>> updateUser(
+    public ResponseEntity<UserDto> updateUser(
             @PathVariable @NotNull @Positive Long userId,
             @RequestBody @NotNull @Valid UpdateUserRequest request
     ) {
-        return ResponseEntity.ok(ApiResponse.success(
-                "User updated successfully",
+        return ResponseEntity.ok(
                 userService.updateUser(userId, request)
-        ));
+        );
     }
 
     @DeleteMapping("/{userId}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'SERVICE_MANAGER')")
-    public ResponseEntity<ApiResponse<Object>> deleteUser(
+    public ResponseEntity<Void> deleteUser(
             @PathVariable @NotNull @Positive Long userId
     ) {
         userService.deleteUser(userId);
-        return ResponseEntity.ok(ApiResponse.success(
-                "User deleted successfully",
-                null
-        ));
+        return ResponseEntity.noContent().build();
     }
 }

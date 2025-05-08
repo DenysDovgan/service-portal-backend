@@ -87,7 +87,7 @@ public class UserService {
     }
 
     @Transactional
-    public void changePassword(ChangePasswordRequest request, Long userId) {
+    public UserDto changePassword(ChangePasswordRequest request, Long userId) {
         log.info("Initiating password change for user with id: {}", userId);
 
         User targetUser = userValidator.validateChangePassword(request, userId);
@@ -99,6 +99,7 @@ public class UserService {
         notificationService.sendPasswordChangedNotification(userMapper.toDto(targetUser));
 
         log.info("Password successfully changed for user with id: {}", userId);
+        return userMapper.toDto(targetUser);
     }
 
     @Transactional
